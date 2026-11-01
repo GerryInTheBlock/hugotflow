@@ -54,6 +54,8 @@ export function QrScanner({ active, onCode, onStatus, onTurnOn, retryKey }: QrSc
   useEffect(() => {
     let stopped = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let darkSince: number | null = null;
+    let warned = false;
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -96,6 +98,20 @@ export function QrScanner({ active, onCode, onStatus, onTurnOn, retryKey }: QrSc
             canvas.height = Math.round(video.videoHeight * scale);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            // A closed privacy shutter or a camera busy in another app sends an all-black picture.
+            let light = 0;
+            for (let i = 0; i < img.data.length; i += 400) light += img.data[i] + img.data[i + 1] + img.data[i + 2];
+            const dark = light / (img.data.length / 400) / 3 < 6;
+            darkSince = dark ? (darkSince ?? Date.now()) : null;
+            const warn = darkSince !== null && Date.now() - darkSince > 3000;
+            if (warn !== warned) {
+              warned = warn;
+              setMessage(
+                warn
+                  ? "The camera is on but the picture is black. Open the laptop's camera shutter, close other apps using the camera (Zoom, Teams, Camera), then press Stop camera and Test Scanner."
+                  : null,
+              );
+            }
             const found = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
             const now = Date.now();
             if (found?.data && !(lastRef.current && lastRef.current.text === found.data && now - lastRef.current.at < 4000)) {
