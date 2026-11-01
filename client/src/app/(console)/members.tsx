@@ -24,7 +24,9 @@ import {
   WideButton,
   useWide,
 } from "@/components/console";
+import { Avatar, LiveAttendance, NotificationsPanel } from "@/components/console-panels";
 import { Icon } from "@/components/Icon";
+import { checkIn } from "@/lib/attendance";
 import { useAuth } from "@/lib/auth";
 import { clockTime, dayMonth, daysUntil, manilaToday, peso, shortDate, timeOrDate } from "@/lib/format";
 import { itemLabel, methodLabel, statusLabel, statusTone, type PaymentStatus } from "@/lib/payments";
@@ -71,6 +73,7 @@ export default function MembersPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"member" | "team" | "inactive">("member");
   const [selected, setSelected] = useState<string | null>(null);
+  const [admitKey, setAdmitKey] = useState(0);
   const [showAdd, setShowAdd] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -165,6 +168,10 @@ export default function MembersPage() {
                         lastVisit={lastVisit.get(r.user_id) ?? null}
                         health={isOwner ? healthLine(health.get(r.user_id)) : null}
                         onOpen={() => setSelected(r.user_id)}
+                        onAdmitted={() => {
+                          load();
+                          setAdmitKey((k) => k + 1);
+                        }}
                       />
                     </View>
                   ))}
@@ -176,7 +183,7 @@ export default function MembersPage() {
         side={
           <>
             <NotificationsPanel isOwner={isOwner} />
-            <LiveAttendance />
+            <LiveAttendance refreshKey={admitKey} />
           </>
         }
       />
@@ -200,21 +207,6 @@ function AddAccountNote({ onClose }: { onClose: () => void }) {
 
 // ---------------------------------------------------------------- member card (Figma "Members" grid)
 
-function Avatar({ name, photo, size = 60 }: { name: string; photo: string | null; size?: number }) {
-  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("");
-  return (
-    <View style={[brandGlow, { width: size, height: size, borderRadius: size / 2 }]}>
-      <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-        {photo ? (
-          <Image source={{ uri: photo }} style={{ width: size, height: size }} />
-        ) : (
-          <Text className="font-extrabold text-xl text-ink">{initials}</Text>
-        )}
-      </LinearGradient>
-    </View>
-  );
-}
-
 function InfoLine({ label, value }: { label: string; value: string }) {
   return (
     <View className="px-[10px] py-[5px]">
@@ -230,14 +222,36 @@ function MemberCard({
   lastVisit,
   health,
   onOpen,
+  onAdmitted,
 }: {
   member: Row;
   membership: { plan: string; ends: string } | null;
   lastVisit: string | null;
   health: string | null;
   onOpen: () => void;
+  onAdmitted: () => void;
 }) {
   const visit = lastVisit ? `${timeOrDate(lastVisit).includes(":") ? "Today" : dayMonth(lastVisit)}: ${clockTime(lastVisit)}` : "No visits yet";
+  const [busy, setBusy] = useState(false);
+  const [outcome, setOutcome] = useState<{ text: string; ok: boolean } | null>(null);
+
+  async function admit() {
+    setBusy(true);
+    setOutcome(null);
+    try {
+      const r = await checkIn({ method: "name", userId: member.user_id });
+      setOutcome(
+        r.result === "admitted"
+          ? { ok: true, text: `Admitted · ${r.pass_type ?? ""}${r.reentry_until ? ` · re-entry until ${clockTime(r.reentry_until)}` : ""}${r.queued ? " · saved offline" : ""}` }
+          : { ok: false, text: r.reason ?? "Not admitted" },
+      );
+      if (r.result === "admitted") onAdmitted();
+    } catch (e) {
+      setOutcome({ ok: false, text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
     <View className="gap-[10px] rounded-field border border-divider bg-card p-[10px]">
       <Pressable onPress={onOpen} className="flex-row items-center gap-[15px]">
@@ -265,13 +279,13 @@ function MemberCard({
       </View>
       {member.is_active ? (
         <View className="gap-[10px] px-[15px]">
-          {/* Check-in is built with the Attendance module (Iteration 2). */}
-          <View style={[brandGlow, { borderRadius: 100, opacity: 0.45 }]} accessibilityState={{ disabled: true }} accessibilityLabel="Admit Member, available with check-in in Iteration 2">
+          <Pressable onPress={admit} disabled={busy} style={[brandGlow, { borderRadius: 100, opacity: busy ? 0.6 : 1 }]} accessibilityRole="button">
             <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, paddingVertical: 10, paddingHorizontal: 20, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
               <Icon name="plus" size={20} color="#FFFFFF" />
-              <Text className="font-bold text-xs text-ink">Admit Member</Text>
+              <Text className="font-bold text-xs text-ink">{busy ? "Checking…" : "Admit Member"}</Text>
             </LinearGradient>
-          </View>
+          </Pressable>
+          {outcome ? <Note tone={outcome.ok ? "neutral" : "danger"}>{outcome.text}</Note> : null}
           <Pressable
             onPress={() => router.push(`/(console)/payments?member=${member.user_id}&plan=daily`)}
             className="flex-row items-center justify-center gap-[10px] rounded-full bg-white/[0.06] px-5 py-[10px]"
@@ -281,89 +295,6 @@ function MemberCard({
           </Pressable>
         </View>
       ) : null}
-    </View>
-  );
-}
-
-// ---------------------------------------------------------------- side panels
-
-function NotificationsPanel({ isOwner }: { isOwner: boolean }) {
-  const [expiring, setExpiring] = useState(0);
-  const [reports, setReports] = useState(0);
-  const [referrals, setReferrals] = useState(0);
-
-  useEffect(() => {
-    const today = manilaToday();
-    supabase
-      .from("subscribers")
-      .select("user_id, expiration_date")
-      .eq("status", "active")
-      .gte("expiration_date", today)
-      .then(({ data }) => {
-        const latest = new Map<string, string>();
-        for (const s of (data ?? []) as { user_id: string; expiration_date: string }[])
-          if (!latest.has(s.user_id) || s.expiration_date > latest.get(s.user_id)!) latest.set(s.user_id, s.expiration_date);
-        setExpiring([...latest.values()].filter((d) => daysUntil(d) <= 7).length);
-      });
-    supabase
-      .from("equipment_reports")
-      .select("report_id", { count: "exact", head: true })
-      .eq("status", "pending_review")
-      .then(({ count }) => setReports(count ?? 0));
-    if (isOwner)
-      supabase
-        .from("high_risk_alerts")
-        .select("alert_id", { count: "exact", head: true })
-        .gte("created_at", new Date(`${today}T00:00:00+08:00`).toISOString())
-        .then(({ count }) => setReferrals(count ?? 0));
-  }, [isOwner]);
-
-  return (
-    <View style={{ gap: 15 }} className="rounded-field border border-line bg-card px-[15px] pb-[25px] pt-[15px]">
-      <PanelHeader title="Notifications" subtitle="Items requiring your attention" />
-      <View className="gap-[15px] px-[10px]">
-        <AlertPill icon="line-chart" label={`${expiring} subscription${expiring === 1 ? "" : "s"} expire in 7 days`} onPress={() => router.push("/(console)/payments?tab=expiring")} />
-        <AlertPill icon="dumbbell" label={`${reports} equipment report${reports === 1 ? "" : "s"} need review`} onPress={() => router.push("/(console)/equipment")} />
-        {isOwner ? (
-          <AlertPill icon="push-notification" label={`${referrals} severe health referral${referrals === 1 ? "" : "s"} today`} onPress={() => router.push("/(console)/engine")} />
-        ) : null}
-      </View>
-    </View>
-  );
-}
-
-type Visit = { log_id: string; checkin_at: string; method: string; user: { full_name: string } | null; walkin: { full_name: string } | null };
-
-function LiveAttendance() {
-  const [visits, setVisits] = useState<Visit[] | null>(null);
-  useEffect(() => {
-    supabase
-      .from("attendance_logs")
-      .select("log_id, checkin_at, method, user:users!attendance_logs_user_id_fkey(full_name), walkin:walkin_clients(full_name)")
-      .gte("checkin_at", new Date(`${manilaToday()}T00:00:00+08:00`).toISOString())
-      .order("checkin_at", { ascending: false })
-      .limit(30)
-      .then(({ data }) => setVisits((data ?? []) as unknown as Visit[]));
-  }, []);
-
-  return (
-    <View
-      style={{ gap: 20, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
-      className="grow rounded-field border border-divider bg-white/[0.04] p-[15px]"
-    >
-      <PanelHeader icon="checked-user" title="Live attendance" subtitle="Today's check-ins" />
-      <View className="gap-[10px] border-r border-line-strong pr-[15px]">
-        {visits === null ? <Empty>Loading…</Empty> : visits.length === 0 ? <Empty>No check-ins yet today.</Empty> : null}
-        {visits?.map((v) => (
-          <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-white/[0.06] px-5">
-            <View className="flex-row items-center gap-[10px]">
-              <Icon name="standing-man" size={25} />
-              <Text className="font-extrabold text-base text-ink">{v.user?.full_name ?? v.walkin?.full_name ?? "—"}</Text>
-            </View>
-            <Text className="font-medium text-sm text-ink-2">{clockTime(v.checkin_at)}</Text>
-          </View>
-        ))}
-      </View>
     </View>
   );
 }
