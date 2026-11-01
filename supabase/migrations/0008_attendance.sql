@@ -38,7 +38,7 @@ declare
   me        uuid := auth.uid();
   my_role   public.user_role := public.current_app_role();
   at_time   timestamptz := least(coalesce(p_checked_at, now()), now());
-  offline   boolean := p_checked_at is not null and p_checked_at < now() - interval '1 minute';
+  offline   boolean := p_client_uuid is not null;   -- only the laptop's offline queue sends its own id
   today     date;
   parts     text[];
   win       bigint;
