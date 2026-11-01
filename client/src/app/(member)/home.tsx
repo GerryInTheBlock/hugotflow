@@ -3,7 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/Icon";
-import { Badge, Button, Card, Logo, Screen, Title, Upcoming } from "@/components/ui";
+import { Badge, Button, Card, Logo, Screen, Title } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 import { manilaToday, shortDate } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
@@ -19,6 +19,7 @@ export default function MemberHome() {
   const { profile } = useAuth();
   const [membership, setMembership] = useState<Membership>(null);
   const [unread, setUnread] = useState(0);
+  const [visits, setVisits] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -38,6 +39,15 @@ export default function MemberHome() {
         .eq("user_id", profile.user_id)
         .is("read_at", null)
         .then(({ count }) => setUnread(count ?? 0));
+      // Days visited this month (one per day), as on the Attendance tab.
+      supabase
+        .from("attendance_logs")
+        .select("checkin_at")
+        .eq("user_id", profile.user_id)
+        .gte("checkin_at", new Date(`${manilaToday().slice(0, 8)}01T00:00:00+08:00`).toISOString())
+        .then(({ data }) =>
+          setVisits(new Set((data ?? []).map((v: { checkin_at: string }) => new Date(v.checkin_at).toLocaleDateString("en-CA", { timeZone: "Asia/Manila" }))).size),
+        );
     }, [profile]),
   );
 
@@ -78,7 +88,7 @@ export default function MemberHome() {
               ? `${active ? "Active until" : "Ended"} ${shortDate(membership.expiration_date)}`
               : "Ask the front desk about Half-month and Monthly plans, or request a Day Pass below."}
           </Text>
-          <Button label="Show my entry QR" onPress={() => {}} disabled />
+          <Button label="Show my entry QR" onPress={() => router.push("/(member)/entry-pass")} />
         </Card>
       </Pressable>
 
@@ -91,7 +101,15 @@ export default function MemberHome() {
         </View>
       </View>
 
-      <Upcoming title="Entry QR and attendance summary" iteration={2} paper="Fig 11 and the Attendance module (Chapter 1 Scope)" />
+      <Pressable onPress={() => router.navigate("/(member)/attendance")} className="gap-[5px] rounded-field bg-white/[0.06] p-5">
+        <View className="flex-row items-center justify-between">
+          <Text className="font-bold text-base text-ink">Attendance Summary</Text>
+          <Icon name="arrow-right" size={25} />
+        </View>
+        <Text className="font-medium text-sm text-ink-2">
+          Your attendance this month: {visits} visit{visits === 1 ? "" : "s"}
+        </Text>
+      </Pressable>
     </Screen>
   );
 }

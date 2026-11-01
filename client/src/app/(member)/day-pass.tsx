@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { Icon, type IconName } from "@/components/Icon";
@@ -126,11 +126,14 @@ export default function DayPassScreen() {
           </View>
 
           {active ? (
-            <Notice>
-              {active.expires_at
-                ? `Your Day Pass is active until ${time(active.expires_at)}.`
-                : "You already have a Day Pass. It starts when you first scan at the entrance."}
-            </Notice>
+            <>
+              <Notice>
+                {active.expires_at
+                  ? `Your Day Pass is active until ${time(active.expires_at)}.`
+                  : "You already have a Day Pass. It starts when you first scan at the entrance."}
+              </Notice>
+              <Button label="Show my Day Pass QR" onPress={() => router.push("/(member)/entry-pass")} />
+            </>
           ) : (
             <>
               <View className="gap-[5px] rounded-field bg-white/[0.06] p-5">
