@@ -1,5 +1,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import * as Linking from "expo-linking";
+import { Platform } from "react-native";
 import { supabase } from "./supabase";
 import type { Profile } from "./types";
 
@@ -18,6 +20,7 @@ type AuthState = {
   signIn: (email: string, password: string) => Promise<string | null>;
   signUp: (input: SignUpInput) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   resetPassword: (email: string) => Promise<string | null>;
+  updatePassword: (password: string) => Promise<string | null>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -84,8 +87,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null, needsConfirmation: !data.session };
   }, []);
 
+  // The email link must come back to the app's "Set a new password" screen (web address or hugotflow:// on phones).
+  // Supabase only follows it if the address is listed in Authentication > URL Configuration > Redirect URLs.
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+    const redirectTo =
+      Platform.OS === "web" && typeof window !== "undefined"
+        ? `${window.location.origin}/reset-password`
+        : Linking.createURL("/reset-password");
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
+    return error ? friendly(error.message) : null;
+  }, []);
+
+  const updatePassword = useCallback(async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
     return error ? friendly(error.message) : null;
   }, []);
 
@@ -98,8 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session]);
 
   const value = useMemo(
-    () => ({ session, profile, loading, signIn, signUp, resetPassword, signOut, refreshProfile }),
-    [session, profile, loading, signIn, signUp, resetPassword, signOut, refreshProfile],
+    () => ({ session, profile, loading, signIn, signUp, resetPassword, updatePassword, signOut, refreshProfile }),
+    [session, profile, loading, signIn, signUp, resetPassword, updatePassword, signOut, refreshProfile],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -117,5 +131,8 @@ function friendly(message: string) {
     return "We couldn't create the account. Hugot Gym accepts members aged 16 and above.";
   if (/email not confirmed/i.test(message)) return "Please confirm your email first. Check your inbox.";
   if (/already registered/i.test(message)) return "That email already has an account. Try logging in.";
+  if (/rate limit/i.test(message)) return "Too many emails were sent just now. Wait a few minutes and try again.";
+  if (/should be different/i.test(message)) return "Choose a password different from your old one.";
+  if (/at least 6 characters|weak password/i.test(message)) return "Use at least 6 characters for your password.";
   return message;
 }
