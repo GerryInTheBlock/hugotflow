@@ -8,6 +8,10 @@ export type QrScannerProps = {
   active: boolean;
   onCode: (text: string) => void;
   onStatus?: (status: "off" | "starting" | "on" | "error", message?: string) => void;
+  /** Shown as a button inside the camera box when the camera is off or failed. */
+  onTurnOn?: () => void;
+  /** Change it to start the camera again after an error (e.g. after allowing camera access). */
+  retryKey?: number;
 };
 
 export function QrScanner(_props: QrScannerProps) {

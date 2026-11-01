@@ -6,7 +6,7 @@
  */
 import jsQR from "jsqr";
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Toggle } from "../console";
 import type { QrScannerProps } from "./QrScanner";
 
@@ -32,7 +32,7 @@ export function Viewfinder({ live }: { live: boolean }) {
   );
 }
 
-export function QrScanner({ active, onCode, onStatus }: QrScannerProps) {
+export function QrScanner({ active, onCode, onStatus, onTurnOn, retryKey }: QrScannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastRef = useRef<{ text: string; at: number } | null>(null);
@@ -79,7 +79,8 @@ export function QrScanner({ active, onCode, onStatus }: QrScannerProps) {
         }
         streamRef.current = stream;
         const track = stream.getVideoTracks()[0];
-        if (track?.label) setLabel(track.label.replace(/\s*\([^)]*\)\s*$/, "") || "Front Camera");
+        const name = track?.label.replace(/\s*\([^)]*\)\s*$/, "") ?? "";
+        setLabel(name && name.length <= 40 ? name : "Front Camera");
         const caps = (track?.getCapabilities?.() ?? {}) as MediaTrackCapabilities & { torch?: boolean };
         setTorchSupported(!!caps.torch);
         const video = videoRef.current!;
@@ -89,9 +90,11 @@ export function QrScanner({ active, onCode, onStatus }: QrScannerProps) {
         const tick = () => {
           if (stopped) return;
           if (ctx && video.readyState >= 2 && video.videoWidth) {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
+            // Read a smaller copy of the frame: a phone QR held up to the laptop is still large enough, and it keeps older laptops fast.
+            const scale = Math.min(1, 640 / video.videoWidth);
+            canvas.width = Math.round(video.videoWidth * scale);
+            canvas.height = Math.round(video.videoHeight * scale);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const found = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
             const now = Date.now();
@@ -119,7 +122,7 @@ export function QrScanner({ active, onCode, onStatus }: QrScannerProps) {
     if (active) start();
     else report("off");
     return stop;
-  }, [active, onCode, report]);
+  }, [active, onCode, report, retryKey]);
 
   useEffect(() => {
     const track = streamRef.current?.getVideoTracks()[0];
@@ -139,6 +142,11 @@ export function QrScanner({ active, onCode, onStatus }: QrScannerProps) {
         <Viewfinder live={status === "on"} />
         {status === "starting" ? (
           <Text className="absolute bottom-3 self-center font-medium text-xs text-ink-2">Starting camera…</Text>
+        ) : null}
+        {(status === "off" || status === "error") && onTurnOn ? (
+          <Pressable onPress={onTurnOn} className="absolute bottom-3 self-center rounded-field bg-white/[0.12] px-4 py-2">
+            <Text className="font-bold text-xs text-ink">{status === "error" ? "Try again" : "Turn on camera"}</Text>
+          </Pressable>
         ) : null}
       </View>
       <View className="flex-row items-center gap-[25px]">

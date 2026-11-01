@@ -47,28 +47,51 @@ export default function AttendancePage() {
   const { online, queued } = useSyncStatus();
   const [tab, setTab] = useState<"scan" | "manual">("scan");
   const [mode, setMode] = useState<Mode>("member");
-  const [camera, setCamera] = useState(false);
+  // The camera is on whenever Scan QR is open; staff can stop it with the Stop camera button.
+  const [camera, setCamera] = useState(true);
+  const [cameraTry, setCameraTry] = useState(0);
   const [typing, setTyping] = useState(false);
   const [code, setCode] = useState("");
-  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [result, setResult] = useState<(CheckInResult & { already?: boolean }) | null>(null);
   const [busy, setBusy] = useState(false);
   const [terminal, setTerminal] = useState(false);
   const [dayPassFor, setDayPassFor] = useState<DayPassTarget | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // A phone held in front of the camera is read several times a second. Once a person is admitted,
+  // scans of the same person in the next minute show "Already checked in" instead of logging again.
+  const recent = useRef(new Map<string, { at: number; result: CheckInResult | null }>());
+
   const submit = useCallback(async (text: string) => {
     const value = text.trim();
     if (!value) return;
+    const parsed = parseCode(value);
+    if (!parsed) {
+      setResult({ result: "denied", reason: "This is not a HugotFlow code. Members show it under Show my entry QR." });
+      setCode("");
+      return;
+    }
+    const person = parsed.kind === "member" ? parsed.userId : parsed.passId;
+    const seen = recent.current.get(person);
+    if (seen && Date.now() - seen.at < 60_000) {
+      // Still being checked (result null) or admitted moments ago: no second entry.
+      if (seen.result) setResult({ ...seen.result, already: true });
+      setCode("");
+      return;
+    }
+    recent.current.set(person, { at: Date.now(), result: null });
     setBusy(true);
     try {
-      if (!parseCode(value)) {
-        setResult({ result: "denied", reason: "This is not a HugotFlow code. Members show it under Show my entry QR." });
-        return;
-      }
       const r = await checkIn({ method: "dynamic_qr", qr: value });
       setResult(r);
-      if (r.result === "admitted") setRefreshKey((k) => k + 1);
+      if (r.result === "admitted") {
+        recent.current.set(person, { at: Date.now(), result: r });
+        setRefreshKey((k) => k + 1);
+      } else {
+        recent.current.delete(person); // a refused scan can be retried straight away (e.g. after Refresh QR)
+      }
     } catch (e) {
+      recent.current.delete(person);
       setResult({ result: "denied", reason: (e as Error).message });
     } finally {
       setBusy(false);
@@ -119,7 +142,15 @@ export default function AttendancePage() {
           ]}
         />
       </View>
-      <QrScanner active={camera} onCode={submit} />
+      <QrScanner
+        active={camera && tab === "scan" && !terminal && !dayPassFor}
+        onCode={submit}
+        retryKey={cameraTry}
+        onTurnOn={() => {
+          setCamera(true);
+          setCameraTry((n) => n + 1);
+        }}
+      />
       {result ? <ResultBanner result={result} /> : null}
       <View className="h-px bg-line" />
       <Text className="font-medium text-xs text-ink-2">
@@ -231,7 +262,15 @@ function ModeOption({ on, onPress, title, body }: { on: boolean; onPress: () => 
   );
 }
 
-function ResultBanner({ result }: { result: CheckInResult }) {
+function ResultBanner({ result }: { result: CheckInResult & { already?: boolean } }) {
+  if (result.already) {
+    return (
+      <View className="gap-1 rounded-field bg-ok/20 p-3">
+        <Text className="font-bold text-sm text-ok-ink">Already checked in{result.visitor ? ` · ${result.visitor}` : ""}</Text>
+        <Text className="font-medium text-xs text-ink-2">Admitted moments ago, so no second entry was logged.</Text>
+      </View>
+    );
+  }
   const ok = result.result === "admitted";
   return (
     <View className={`gap-1 rounded-field p-3 ${ok ? "bg-ok/20" : "bg-danger/20"}`}>
