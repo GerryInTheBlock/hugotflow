@@ -5,7 +5,7 @@
  */
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, type ReactNode } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View, useWindowDimensions, type TextInputProps } from "react-native";
+import { ActivityIndicator, Modal, Pressable, ScrollView, Text, TextInput, View, useWindowDimensions, type TextInputProps } from "react-native";
 import { brandGlow, brandGradient, colors } from "@/theme";
 import { Icon, type IconName } from "./Icon";
 
@@ -174,6 +174,7 @@ export function DataTable<T>({
   empty,
   expanded,
   onRowPress,
+  variant = "default",
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -181,15 +182,18 @@ export function DataTable<T>({
   empty?: string;
   expanded?: (row: T) => ReactNode | null;
   onRowPress?: (row: T) => void;
+  /** "log": the Attendance entry log style (9 px grey caps header, 11 px white cells, taller rows). */
+  variant?: "default" | "log";
 }) {
   const minWidth = columns.reduce((w, c) => w + c.width + 8, 24);
+  const log = variant === "log";
   return (
     <View className="overflow-hidden rounded-field border border-line bg-card">
       <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }} showsHorizontalScrollIndicator={false}>
         <View style={{ minWidth, flex: 1 }}>
-          <View className="flex-row items-center gap-2 bg-field px-3 py-[9px]">
+          <View className={`flex-row items-center gap-2 px-3 ${log ? "bg-raised py-2" : "bg-field py-[9px]"}`}>
             {columns.map((c) => (
-              <Text key={c.label} style={{ width: c.width }} className="font-bold text-[10px] text-ink">
+              <Text key={c.label} style={{ width: c.width }} className={log ? "font-semibold text-[9px] uppercase text-ink-2" : "font-bold text-[10px] text-ink"}>
                 {c.label}
               </Text>
             ))}
@@ -200,16 +204,16 @@ export function DataTable<T>({
           {rows.map((row) => {
             const extra = expanded?.(row);
             const cells = (
-              <View className="flex-row items-center gap-2 px-3 py-[9px]">
+              <View className={`flex-row items-center gap-2 px-3 ${log ? "py-[10px]" : "py-[9px]"}`}>
                 {columns.map((c) => (
                   <View key={c.label} style={{ width: c.width }}>
-                    {cell(c.render(row))}
+                    {cell(c.render(row), log)}
                   </View>
                 ))}
               </View>
             );
             return (
-              <View key={rowKey(row)} className="border-t border-divider">
+              <View key={rowKey(row)} className={`border-t ${log ? "border-line" : "border-divider"}`}>
                 {onRowPress ? <Pressable onPress={() => onRowPress(row)}>{cells}</Pressable> : cells}
                 {extra ? <View className="gap-3 px-3 pb-3">{extra}</View> : null}
               </View>
@@ -221,9 +225,9 @@ export function DataTable<T>({
   );
 }
 
-function cell(content: ReactNode) {
+function cell(content: ReactNode, log = false) {
   return typeof content === "string" || typeof content === "number" ? (
-    <Text className="font-medium text-[11px] text-ink-soft">{content}</Text>
+    <Text className={`font-medium text-[11px] ${log ? "text-ink" : "text-ink-soft"}`}>{content}</Text>
   ) : (
     content
   );
@@ -408,5 +412,51 @@ export function ConfirmStep({
         <SmallButton label="Cancel" variant="soft" onPress={onCancel} disabled={busy} />
       </View>
     </View>
+  );
+}
+
+/** Tiny pill badge used in the Attendance entry log (9 px). */
+export function LogBadge({ label, tone = "neutral" }: { label: string; tone?: "ok" | "neutral" | "info" }) {
+  const cls = tone === "ok" ? ["bg-ok/20", "text-ok-ink"] : tone === "info" ? ["bg-info", "text-ink"] : ["bg-field", "text-ink-soft"];
+  return (
+    <View className={`self-start rounded-full px-2 py-[3px] ${cls[0]}`}>
+      <Text className={`font-semibold text-[9px] ${cls[1]}`}>{label}</Text>
+    </View>
+  );
+}
+
+/** Two-option switch in a grey track ("Scan QR | Manual lookup"). */
+export function Segmented<T extends string>({ options, value, onChange }: { options: { value: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+  return (
+    <View className="flex-row items-center gap-[10px] self-start rounded-field bg-field py-[5px] pl-[5px] pr-[10px]">
+      {options.map((o) =>
+        o.value === value ? (
+          <Pressable key={o.value} onPress={() => onChange(o.value)} className="rounded-chip border border-line bg-card px-[10px] py-[3px]">
+            <Text className="font-medium text-xs text-ink">{o.label}</Text>
+          </Pressable>
+        ) : (
+          <Pressable key={o.value} onPress={() => onChange(o.value)} className="py-[3px]">
+            <Text className="font-medium text-xs text-ink">{o.label}</Text>
+          </Pressable>
+        ),
+      )}
+    </View>
+  );
+}
+
+/** Centered pop-up over a dimmed page (Figma "Dim" + "Modal"). Closes on the backdrop or Escape. */
+export function PopUp({ visible, onClose, width = 600, children }: { visible: boolean; onClose: () => void; width?: number; children: ReactNode }) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable onPress={onClose} className="flex-1 items-center justify-center bg-black/60 p-4">
+        <Pressable
+          onPress={(e) => e.stopPropagation?.()}
+          style={{ width: "100%", maxWidth: width, maxHeight: "100%", shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
+          className="rounded-[15px] border border-line bg-card"
+        >
+          <ScrollView contentContainerStyle={{ padding: 24, gap: 14 }}>{children}</ScrollView>
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 }

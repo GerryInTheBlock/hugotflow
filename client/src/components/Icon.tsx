@@ -30,6 +30,7 @@ const sources = {
   "push-notification": require("../../assets/icons/push-notification.png"),
   "qr-code": require("../../assets/icons/qr-code.png"),
   search: require("../../assets/icons/search.png"),
+  staff: require("../../assets/icons/staff.png"),
   "standing-man": require("../../assets/icons/standing-man.png"),
   ticket: require("../../assets/icons/ticket.png"),
   "toggle-on": require("../../assets/icons/toggle-on.png"),
