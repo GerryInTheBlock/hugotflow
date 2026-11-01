@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hugotflow-web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8081"
+      ],
+      "cwd": "client",
+      "port": 8081
+    },
+    {
+      "name": "hugotflow-member-view",
+      "url": "http://127.0.0.1:8081"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "HugotFlow",
+    "slug": "hugotflow",
+    "scheme": "hugotflow",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0A0B",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true, "bundleIdentifier": "ph.hugotgym.hugotflow" },
+    "android": { "package": "ph.hugotgym.hugotflow", "edgeToEdgeEnabled": true },
+    "web": { "bundler": "metro", "output": "single", "name": "HugotFlow" },
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": { "typedRoutes": true }
+  }
+}

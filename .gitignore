@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+# Secrets: Supabase keys live only in client/.env (see client/.env.example)
+.env
+.env.*
+!.env.example
+# Personal Claude Code settings (launch.json is shared)
+.claude/settings.local.json
+# Python
+.venv/
+__pycache__/
+*.pyc
