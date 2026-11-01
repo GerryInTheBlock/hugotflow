@@ -9,6 +9,7 @@ Run the migrations once, in order, in **Supabase > SQL Editor > New query** (pas
 5. `migrations/0005_payments_settings.sql`: payment functions (record, confirm/reject, refund) and Settings safeguards
 6. `migrations/0006_day_pass_requests.sql`: Day Pass requests from the app ("Confirm paid"), receipt numbers `HF-R-2026-0412`, receipts for members
 7. `migrations/0007_hardening.sql`: closes the job and trigger functions to the API (Supabase security advisor)
+8. `migrations/0008_attendance.sql`: check-in (`check_in`), non-match records, and the offline data for the front-desk laptop (`terminal_snapshot`)
 
 Before step 4, turn on **pg_cron** in **Database > Extensions** so the jobs get scheduled:
 - 12-hour Day Pass expiry, every 5 minutes
@@ -47,7 +48,13 @@ After that, the owner manages roles from **Settings > User accounts** in the web
 
 Payments are never written to directly: the app calls `record_payment` and `confirm_day_pass_payment` (staff/owner),
 `request_day_pass` and `cancel_day_pass_request` (members), `get_receipt`, `review_payment`
-and `refund_payment` (owner only). Prices are read from `plans` and `gym_settings` inside the database.
+and `refund_payment` (owner only). Check-ins go through `check_in`, `record_non_match` and `terminal_snapshot` (staff/owner). Prices are read from `plans` and `gym_settings` inside the database.
 
-Tested with `tests/rls_test.sql` (Iteration 0, PostgreSQL 16) and `tests/payments_test.sql`
-(Iteration 1, PGlite / PostgreSQL 17). Run the stub, the seven migrations, then both test files.
+Tested with `tests/rls_test.sql` (Iteration 0, PostgreSQL 16), `tests/payments_test.sql`
+(Iteration 1) and `tests/attendance_test.sql` (Iteration 2), on PGlite / PostgreSQL 17. Run the stub, the eight migrations, then the three test files.
+
+## How the entry QR codes work
+
+- **Member code:** `HF1.<user id>.<window>.<code>`. The window is the current time divided into 30-second steps, and the code is the first 10 hex characters of HMAC-SHA256(the member’s secret in `member_qr_secrets`, window). The phone and the database work it out the same way, so the phone needs no internet to show it. The front desk accepts the current window and the one on either side (±30 s for clock differences).
+- **Day Pass code:** `HFD.<pass id>.<token>`, using `day_passes.token`.
+- **Offline:** the front-desk laptop keeps the latest `terminal_snapshot()` (members, plan end dates, QR secrets, walk-ins with a pass). With no connection it checks people against that copy and queues the check-in; when the connection returns, the queue is sent with the original time, and `client_uuid` stops a check-in from being saved twice.

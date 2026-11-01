@@ -81,3 +81,39 @@ Not checked yet: the screens with real data against a live Supabase project, and
 Added field `transactions.subscriber_id` (links a subscription payment to the plan it bought, so a
 rejected or refunded payment cancels that plan).
 Added field `day_passes.request_no` (`HF-DP-0429`, shown on the member's waiting screen).
+
+## Iteration 2: Attendance, Check-in Terminal and offline check-in (Nov 2026)
+
+| Paper requirement | Where | Status |
+| --- | --- | --- |
+| Personal QR code that changes every 30 seconds (Scope) | Member/instructor Entry Pass, `lib/qr.ts`; checked in `check_in` (HMAC of the 30-second window, ±1 window for clock drift) | Done, tested (A1–A3) |
+| Staff scan the code at the front desk (Fig 4) | Console > Attendance: laptop camera, USB scanner, or "Enter code manually" | Done, tested live with a real code |
+| 12-hour Day Pass, ₱50, re-entry within the window (Scope, Fig 11b) | First scan starts the window from Settings; re-entry follows "Re-entry allowed" | Done, tested (A5–A7, A9) |
+| Only members with an active plan or pass get in, with a reason when refused | `check_in` | Done, tested (A4, A9) |
+| Check-in Terminal: find by 3-digit PIN, phone or name; photo check; Admit / Generate ₱50 Day Pass / Record non-match (Fig 16) | Attendance > Manual lookup, Members > Admit Member | Done; initials instead of photos until uploads are added |
+| Register a walk-in client and issue the Day Pass | "Register walk-in" pop-up: saves the walk-in, records the payment, checks them in | Done |
+| Non-matches recorded for the owner | `record_non_match` → owner-only audit log `NON_MATCH` | Done, tested (A12) |
+| Offline check-in from the last synced data, synced when the connection returns (Scope) | `terminal_snapshot` cached on the laptop, queue in `lib/attendance.ts`, "Offline · N queued" badge | Done, tested (A11, A13) and live (offline admit then sync, `synced_from_offline` true) |
+| Front-desk console opens with no internet | Installable web app: `public/sw.js`, `manifest.json` | Done; checked on a production build with the server stopped |
+| Health data stays away from staff (RA 10173) | Snapshot gives the health chip to the owner only | Done, tested (A13) |
+| Only the front desk or owner checks people in; members see only their own visits (Fig 4) | Role check in `check_in` / `terminal_snapshot`, RLS on `attendance_logs` | Done, tested (A10, A14, A15) |
+| Owner views attendance records (Fig 4) | Attendance > Today's entries, Live attendance panel | Done |
+| Member views own attendance (Fig 4) | Member and instructor Attendance tabs, Home summary | Done |
+
+### Matched to Figma (Iteration 2)
+
+Built from frames 38:1615 (Attendance), 38:2530 (Check-in Terminal), 38:2720 (Register walk-in client),
+38:1324 / 38:1360 (Entry Pass), 38:352 / 38:438 (Attendance tabs). Differences on purpose:
+
+- The camera viewfinder corners are drawn in code (the Figma image is a 32 px placeholder).
+- A "Register walk-in" button was added to the Scan Mode panel, because the frame has no way to open the walk-in pop-up.
+- The entry log is titled "Today's entries".
+- Staff, instructors and the owner are admitted as "Gym team" without a plan.
+- The health chip says "Check with the on-call instructor" instead of "Instructor already alerted", because no alert is sent yet (High-Risk Alerts come later).
+- The Live attendance subtitle reads "Today's check-ins", the same as on Members.
+
+Still needs the owner: a real webcam scan test on the gym laptop, and photo uploads.
+
+### ERD changes to show in Figure 20 (Iteration 2)
+
+No new tables. `attendance_logs` uses `client_uuid` (one row per offline check-in) and `synced_from_offline`.
