@@ -1,11 +1,6 @@
-import { Logo, Screen, Title, Upcoming } from "@/components/ui";
+import { MyAttendance } from "@/components/attendance/MyAttendance";
 
-export default function Page() {
-  return (
-    <Screen>
-      <Logo />
-      <Title>Attendance</Title>
-      <Upcoming title="Attendance" iteration={2} paper="Fig 4" />
-    </Screen>
-  );
+/** Figma instructor "Attendance" (38:438). */
+export default function InstructorAttendance() {
+  return <MyAttendance variant="instructor" />;
 }

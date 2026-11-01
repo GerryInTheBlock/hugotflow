@@ -29,6 +29,8 @@ const sources = {
   plus: require("../../assets/icons/plus.png"),
   "push-notification": require("../../assets/icons/push-notification.png"),
   "qr-code": require("../../assets/icons/qr-code.png"),
+  "qr-code-large": require("../../assets/icons/qr-code-large.png"),
+  refresh: require("../../assets/icons/refresh.png"),
   search: require("../../assets/icons/search.png"),
   staff: require("../../assets/icons/staff.png"),
   "standing-man": require("../../assets/icons/standing-man.png"),
