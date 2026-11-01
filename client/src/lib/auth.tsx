@@ -2,6 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "./supabase";
 import type { Profile } from "./types";
 
@@ -27,17 +28,46 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-async function loadProfile(userId: string): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from("users")
-    .select("user_id, full_name, email, contact_number, role, pin, photo_url, birthdate, is_active")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    console.warn("[auth] profile load failed", error.message);
+// The last profile seen on this device, so the app (and the front-desk laptop) still opens offline.
+const PROFILE_CACHE = "hf.auth.profile";
+
+async function cacheProfile(p: Profile | null) {
+  try {
+    const raw = p ? JSON.stringify(p) : null;
+    if (Platform.OS === "web") raw ? globalThis.localStorage?.setItem(PROFILE_CACHE, raw) : globalThis.localStorage?.removeItem(PROFILE_CACHE);
+    else raw ? await AsyncStorage.setItem(PROFILE_CACHE, raw) : await AsyncStorage.removeItem(PROFILE_CACHE);
+  } catch {
+    // storage unavailable: the online path still works
+  }
+}
+
+async function cachedProfile(userId: string): Promise<Profile | null> {
+  try {
+    const raw = Platform.OS === "web" ? globalThis.localStorage?.getItem(PROFILE_CACHE) : await AsyncStorage.getItem(PROFILE_CACHE);
+    const p = raw ? (JSON.parse(raw) as Profile) : null;
+    return p?.user_id === userId ? p : null;
+  } catch {
     return null;
   }
-  return data as Profile | null;
+}
+
+async function loadProfile(userId: string): Promise<Profile | null> {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("user_id, full_name, email, contact_number, role, pin, photo_url, birthdate, is_active")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!error) {
+      await cacheProfile(data as Profile | null);
+      return data as Profile | null;
+    }
+    console.warn("[auth] profile load failed", error.message);
+  } catch (e) {
+    console.warn("[auth] profile load failed", (e as Error).message);
+  }
+  // No connection: use the copy saved the last time this device was online.
+  return cachedProfile(userId);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -104,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    await cacheProfile(null);
     await supabase.auth.signOut();
   }, []);
 
