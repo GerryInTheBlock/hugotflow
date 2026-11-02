@@ -66,9 +66,9 @@ export function SkippedNote({ item, big }: { item: Skipped; big?: boolean }) {
   );
 }
 
-export function GradientButton({ label, onPress, busy, radius = 20 }: { label: string; onPress: () => void; busy?: boolean; radius?: number }) {
+export function GradientButton({ label, onPress, busy, disabled, radius = 20 }: { label: string; onPress: () => void; busy?: boolean; disabled?: boolean; radius?: number }) {
   return (
-    <Pressable onPress={onPress} disabled={busy} style={[brandGlow, { borderRadius: radius, opacity: busy ? 0.7 : 1 }]} accessibilityRole="button">
+    <Pressable onPress={onPress} disabled={busy || disabled} style={[brandGlow, { borderRadius: radius, opacity: busy ? 0.7 : disabled ? 0.45 : 1 }]} accessibilityRole="button" accessibilityState={{ disabled: !!(busy || disabled) }}>
       <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: radius, paddingVertical: 15, alignItems: "center" }}>
         {busy ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-sm text-ink">{label}</Text>}
       </LinearGradient>

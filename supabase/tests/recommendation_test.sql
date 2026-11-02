@@ -114,7 +114,27 @@ reset role;
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R12a start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
 select 'R12b same session' as t, count(distinct (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).session_id);
+reset role;
+
+-- R16 set and rest timing (migration 0012): 1st set of Leg press (3 × 8) = 24 s work, no rest; 2nd set = 24 s + 60 s rest;
+--     first set of the next exercise (Seated chest press 3 × 10) = 30 s work + 60 s rest after the leg press
+select 'R16a timing' as t,
+  (select row(work_s, rest_s)::text from set_timing(r.routine, 0)) as first_set,
+  (select row(work_s, rest_s)::text from set_timing(r.routine, 1)) as second_set,
+  (select row(work_s, rest_s)::text from set_timing(r.routine, 3)) as next_exercise
+  from workout_recommendations r where r.user_id = '00000000-0000-0000-0000-0000000000b1' and r.status = 'active';
+-- R16b completing a set straight away → ERROR "Not yet: … seconds of work on this set."
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R16b too fast' as t, (complete_set((select session_id from workout_sessions limit 1))).sets_done;
+reset role;
+update workout_sessions set started_at = now() - interval '1 minute';   -- the member worked through the first set
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R12c sets' as t, (complete_set((select session_id from workout_sessions limit 1))).sets_done;
+-- R16c the next set during the rest → ERROR "Not yet: … seconds of rest."
+select 'R16c during rest' as t, (complete_set((select session_id from workout_sessions limit 1))).sets_done;
+reset role;
+update workout_sessions set last_set_at = now() - interval '2 minutes';  -- rested and did the second set
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R12d sets' as t, (complete_set((select session_id from workout_sessions limit 1))).sets_done;
 select 'R12e finished' as t, (finish_workout((select session_id from workout_sessions limit 1))).status;
 select 'R12f sessions' as t, count(*) from workout_sessions;

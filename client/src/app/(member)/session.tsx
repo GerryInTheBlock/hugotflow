@@ -4,13 +4,13 @@
  * coming back continues the same session; finished sessions count towards "workouts this week".
  */
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SubScreen } from "@/components/SubScreen";
 import { GradientButton, OutlineButton, shadow } from "@/components/workout";
 import { useAuth } from "@/lib/auth";
-import { activePlan, completeSet, dose, finishWorkout, startWorkout, type Plan, type Session } from "@/lib/workout";
+import { activePlan, clock, completeSet, dose, finishWorkout, setTiming, startWorkout, type Plan, type Session } from "@/lib/workout";
 import { brandGlow, brandGradient, colors } from "@/theme";
 
 export default function WorkoutSession() {
@@ -19,6 +19,14 @@ export default function WorkoutSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [now, setNow] = useState(Date.now());
+
+  // One tick per second drives the set and rest countdowns.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -66,12 +74,23 @@ export default function WorkoutSession() {
   const finished = session.status === "finished" || session.sets_done >= session.sets_total;
   const item = plan.routine[where.index];
 
+  // Set and rest timers (enforced again by complete_set in migration 0012).
+  const timing = setTiming(plan.routine, session.sets_done);
+  const elapsed = (now - new Date(session.last_set_at ?? session.started_at).getTime()) / 1000;
+  const restLeft = Math.max(0, Math.ceil(timing.rest - elapsed));
+  const workLeft = Math.max(0, Math.ceil(timing.rest + timing.work - elapsed));
+  const resting = restLeft > 0;
+  const ready = workLeft === 0;
+
   const complete = async () => {
     setBusy(true);
+    setNotice(null);
     try {
       setSession(await completeSet(session.session_id));
     } catch (e) {
-      setError((e as Error).message);
+      const msg = (e as Error).message;
+      if (msg.startsWith("Not yet")) setNotice(msg);
+      else setError(msg);
     } finally {
       setBusy(false);
     }
@@ -148,8 +167,31 @@ export default function WorkoutSession() {
             </View>
           </View>
         </View>
+        {resting ? (
+          <View style={shadow} className="items-center gap-1 rounded-card border border-line bg-card p-5">
+            <Text className="font-medium text-sm text-ink-2">Rest</Text>
+            <Text className="font-bold text-[48px] leading-[56px] text-ink">{clock(restLeft)}</Text>
+            <Text className="font-medium text-sm text-ink-2">
+              Next: {item.name} · set {where.set + 1} of {where.sets}
+            </Text>
+          </View>
+        ) : (
+          <View className={`items-center gap-1 rounded-card border p-5 ${ready ? "border-ok bg-ok/10" : "border-line bg-card"}`}>
+            <Text className="font-medium text-sm text-ink-2">{item.minutes ? "Time left" : "Set time"}</Text>
+            <Text className="font-bold text-[48px] leading-[56px] text-ink">{clock(workLeft)}</Text>
+            <Text className={`font-medium text-sm ${ready ? "text-ok-ink" : "text-ink-2"}`}>
+              {ready ? (item.minutes ? "Time's up. Tap Done." : "Done with this set? Tap Complete set.") : item.minutes ? "Keep a steady pace." : `Do ${item.reps ?? "10"} controlled reps.`}
+            </Text>
+          </View>
+        )}
         <View className="gap-[10px]">
-          <GradientButton label={item.minutes ? "Done" : "Complete set"} onPress={complete} busy={busy} />
+          {notice ? <Text className="text-center font-medium text-xs text-danger-ink">{notice}</Text> : null}
+          <GradientButton
+            label={resting ? `Resting… ${clock(restLeft)}` : !ready ? `${item.minutes ? "Done" : "Complete set"} in ${clock(workLeft)}` : item.minutes ? "Done" : "Complete set"}
+            onPress={complete}
+            busy={busy}
+            disabled={!ready}
+          />
           <OutlineButton label="Pause workout" onPress={() => router.replace("/(member)/workout")} />
         </View>
       </View>

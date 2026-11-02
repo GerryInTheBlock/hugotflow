@@ -43,7 +43,7 @@ export type Plan = {
   created_at: string;
 };
 
-export type Session = { session_id: string; recommendation_id: string; status: "in_progress" | "finished"; sets_total: number; sets_done: number; started_at: string; finished_at: string | null };
+export type Session = { session_id: string; recommendation_id: string; status: "in_progress" | "finished"; sets_total: number; sets_done: number; started_at: string; finished_at: string | null; last_set_at: string | null };
 
 /** Mirrors services/recommender/app/programs.json. */
 export const PROGRAMS: Record<string, { goal: string; title: string; modified: boolean }> = {
@@ -58,6 +58,30 @@ export const PROGRAMS: Record<string, { goal: string; title: string; modified: b
 
 export const PLAN_SELECT =
   "recommendation_id, user_id, predicted_class, routine, skipped, decision_path, features, model_version, instructor_alert, source, instructor_note, adjusted_at, latency_ms, status, created_at";
+
+/**
+ * Seconds of work for the next set and the rest before it (same rule as set_timing() in migration 0012):
+ * about 3 s per rep (at least 20 s), cardio/mobility the full minutes; rest = the previous set's exercise rest_s.
+ */
+export function setTiming(routine: PlanItem[], setsDone: number) {
+  let remaining = setsDone;
+  let prev: PlanItem | null = null;
+  for (const item of routine) {
+    const n = Math.max(1, item.sets ?? 1);
+    if (remaining < n) {
+      if (remaining > 0) prev = item;
+      const reps = parseInt(String(item.reps ?? "10"), 10) || 10;
+      const work = item.minutes ? item.minutes * 60 : Math.max(20, reps * 3);
+      const rest = setsDone === 0 || !prev ? 0 : prev.rest_s ?? 60;
+      return { work, rest };
+    }
+    remaining -= n;
+    prev = item;
+  }
+  return { work: 0, rest: 0 };
+}
+
+export const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
 
 export const dose = (i: PlanItem) => (i.minutes ? `${i.minutes} min` : `${i.sets ?? 3} x ${i.reps ?? "10"}`);
 export const planMinutes = (routine: PlanItem[]) => {
