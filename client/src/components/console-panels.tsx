@@ -93,7 +93,7 @@ type Visit = {
   checkin_at: string;
   method: string;
   pass_id: string | null;
-  user: { full_name: string } | null;
+  user: { full_name: string; role: string } | null;
   walkin: { full_name: string } | null;
 };
 
@@ -104,7 +104,7 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
   const load = useCallback(() => {
     supabase
       .from("attendance_logs")
-      .select("log_id, checkin_at, method, pass_id, user:users!attendance_logs_user_id_fkey(full_name), walkin:walkin_clients(full_name)")
+      .select("log_id, checkin_at, method, pass_id, user:users!attendance_logs_user_id_fkey(full_name, role), walkin:walkin_clients(full_name)")
       .gte("checkin_at", new Date(`${manilaToday()}T00:00:00+08:00`).toISOString())
       .order("checkin_at", { ascending: false })
       .limit(30)
@@ -131,8 +131,8 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
         {visits?.map((v) => (
           <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-white/[0.06] px-5">
             <View className="flex-shrink flex-row items-center gap-[10px]">
-              {/* Figma: standing figure for members, weightlifter for Day Pass visitors */}
-              <Icon name={v.pass_id ? "weightlifting" : "standing-man"} size={25} />
+              {/* Weightlifter for instructors; standing figure for members, walk-ins and other visitors */}
+              <Icon name={v.user?.role === "instructor" ? "weightlifting" : "standing-man"} size={25} />
               <Text numberOfLines={1} className="flex-shrink font-extrabold text-base text-ink">
                 {v.user?.full_name ?? v.walkin?.full_name ?? "—"}
               </Text>

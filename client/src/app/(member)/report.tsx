@@ -113,7 +113,12 @@ export default function ReportTab() {
                 reports.slice(0, 10).map((r, i) => (
                   <View key={r.report_id} className="gap-[15px]">
                     {i ? <View className="h-px bg-divider" /> : null}
-                    <View className="flex-row items-start justify-between gap-3">
+                    <Pressable
+                      onPress={() => router.push(`/(member)/report-detail/${r.report_id}` as never)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Open report for ${r.equipment?.name ?? "equipment"}`}
+                      className="flex-row items-start justify-between gap-3"
+                    >
                       <View className="flex-1 gap-[10px]">
                         <Text className="font-extrabold text-base text-ink">{r.equipment?.name ?? "Equipment"}</Text>
                         <View className="gap-[5px]">
@@ -127,7 +132,7 @@ export default function ReportTab() {
                         <ReportChip status={r.status} />
                         <Icon name="forward" size={15} />
                       </View>
-                    </View>
+                    </Pressable>
                   </View>
                 ))
               )}

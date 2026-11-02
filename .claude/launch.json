@@ -17,6 +17,19 @@
     {
       "name": "hugotflow-member-view",
       "url": "http://127.0.0.1:8081"
+    },
+    {
+      "name": "hugotflow-engine",
+      "runtimeExecutable": "../../.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "app.main:app",
+        "--port",
+        "8000"
+      ],
+      "cwd": "services/recommender",
+      "port": 8000
     }
   ]
 }

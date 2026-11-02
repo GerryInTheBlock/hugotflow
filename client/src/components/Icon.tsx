@@ -17,7 +17,9 @@ const sources = {
   "check-mark": require("../../assets/icons/check-mark.png"),
   "checked-user": require("../../assets/icons/checked-user.png"),
   dumbbell: require("../../assets/icons/dumbbell.png"),
+  "edit-pencil": require("../../assets/icons/edit-pencil.png"),
   "drop-down": require("../../assets/icons/drop-down.png"),
+  error: require("../../assets/icons/error.png"),
   forward: require("../../assets/icons/forward.png"),
   "high-priority": require("../../assets/icons/high-priority.png"),
   "line-chart": require("../../assets/icons/line-chart.png"),
@@ -40,6 +42,7 @@ const sources = {
   staff: require("../../assets/icons/staff.png"),
   "standing-man": require("../../assets/icons/standing-man.png"),
   ticket: require("../../assets/icons/ticket.png"),
+  trash: require("../../assets/icons/trash.png"),
   "toggle-on": require("../../assets/icons/toggle-on.png"),
   weightlifting: require("../../assets/icons/weightlifting.png"),
 } as const;

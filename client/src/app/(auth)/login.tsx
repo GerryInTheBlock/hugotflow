@@ -4,7 +4,7 @@ import { Platform, Pressable, Text, View } from "react-native";
 import { Button, Card, Field, Logo, Notice, Screen, Title } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 
-/** Figma: "Login" (members & instructors) and "Web Login" (owner & staff). One screen, role decides the home. */
+/** Figma: "Login" and "Web Login". One login screen for every role; the account role decides which home opens. */
 export default function Login() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export default function Login() {
     <Screen className={isWeb ? "items-center justify-center min-h-full" : ""}>
       <View className={isWeb ? "w-full max-w-[440px] gap-4" : "gap-4"}>
         <Logo />
-        <Title kicker={isWeb ? "Owner & staff sign in" : "Member & instructor access"}>Welcome back</Title>
+        <Title kicker="Sign in to Hugot Gym">Welcome back</Title>
         <Card>
           <Field
             label="Email"
@@ -52,9 +52,7 @@ export default function Login() {
           {error ? <Notice tone="danger">{error}</Notice> : null}
           <Button label="Log in" onPress={submit} loading={busy} />
           <Text className="font-regular text-xs text-ink-2">
-            {isWeb
-              ? "On the front-desk laptop, the Check-in Terminal keeps working offline using the last synced member data."
-              : "You will land on your Member or Instructor home based on your account role."}
+            One login for everyone: members, instructors, front-desk staff and the owner each open their own screens.
           </Text>
         </Card>
         <View className="flex-row justify-center gap-1 pt-2">

@@ -1,9 +1,9 @@
 /**
  * Instructor review of one member's health profile (Fig 6). Read-only health details, today's daily status,
  * guardian consent documents (members under 18 with a limitation) with Approve / Ask to resubmit,
- * and "Mark as reviewed". The routine view arrives with recommendations in Iteration 4.
+ * "Mark as reviewed", and View Routine (the plan editor).
  */
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, Text, TextInput, View } from "react-native";
 import { InfoNote } from "@/components/health";
@@ -53,6 +53,9 @@ export default function MemberHealthReview() {
   const [health, setHealth] = useState<HealthProfile | null>(null);
   const [today, setToday] = useState<DailyStatus | null>(null);
   const [consent, setConsent] = useState<Consent | null>(null);
+  const [workouts, setWorkouts] = useState<
+    { session_id: string; finished_at: string | null; started_at: string; sets_done: number; sets_total: number; feeling: DailyStatus["status"] | null; feeling_area: string | null; feeling_note: string | null }[]
+  >([]);
   const [docs, setDocs] = useState<{ form: string | null; cert: string | null }>({ form: null, cert: null });
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -67,6 +70,14 @@ export default function MemberHealthReview() {
       supabase.from("daily_status").select("*").eq("user_id", id).order("status_date", { ascending: false }).limit(1).maybeSingle(),
       supabase.from("guardian_consents").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     ]);
+    supabase
+      .from("workout_sessions")
+      .select("session_id, started_at, finished_at, sets_done, sets_total, feeling, feeling_area, feeling_note")
+      .eq("user_id", id)
+      .eq("status", "finished")
+      .order("finished_at", { ascending: false })
+      .limit(5)
+      .then(({ data }) => setWorkouts((data ?? []) as typeof workouts));
     setUser(u.data as typeof user);
     setHealth(h.data as HealthProfile | null);
     setToday(d.data as DailyStatus | null);
@@ -164,6 +175,27 @@ export default function MemberHealthReview() {
         )}
       </BigCard>
 
+      {/* How each recent workout felt (after-workout check, migration 0015): did the plan suit the member? */}
+      <BigCard gap={8}>
+        <Text className="font-bold text-xl text-ink">Recent workouts</Text>
+        {workouts.length === 0 ? <Text className="font-medium text-sm text-ink-2">No finished workouts yet.</Text> : null}
+        {workouts.map((w) => (
+          <View key={w.session_id} className="gap-1 rounded-field bg-white/[0.06] p-[10px]">
+            <View className="flex-row items-center justify-between">
+              <Text className="font-bold text-sm text-ink">{dateTime(w.finished_at ?? w.started_at)}</Text>
+              <Badge
+                label={w.feeling ? DAILY[w.feeling].short + (w.feeling_area ? ` · ${w.feeling_area}` : "") : "No feedback"}
+                tone={w.feeling === "pain" ? "danger" : w.feeling === "soreness" ? "warn" : w.feeling === "good" ? "ok" : "neutral"}
+              />
+            </View>
+            <Text className="font-medium text-xs text-ink-2">
+              {w.sets_done} of {w.sets_total} sets done
+            </Text>
+            {w.feeling_note ? <Text className="font-medium text-xs text-ink">“{w.feeling_note}”</Text> : null}
+          </View>
+        ))}
+      </BigCard>
+
       {consent ? (
         <BigCard>
           <View className="flex-row items-center justify-between">
@@ -216,7 +248,7 @@ export default function MemberHealthReview() {
           onPress={() => run("review", () => supabase.rpc("mark_profile_reviewed", { p_user_id: id }))}
         />
       ) : null}
-      <Button label="View Routine (with recommendations)" variant="secondary" disabled />
+      <Button label="View Routine" variant="secondary" onPress={() => router.push(`/(instructor)/plan/${id}` as never)} />
     </SubScreen>
   );
 }

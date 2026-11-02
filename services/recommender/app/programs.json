@@ -1,0 +1,83 @@
+{
+  "_about": "Program classes predicted by the C4.5-style tree (Build Plan §6 draft, to be confirmed by the instructors). Each slot lists exercise codes (ml/catalogue.json) in order of preference: the first one that does not strain the member's limitation and whose equipment is not Out of Order is used; a skipped first choice is reported to the member. Dosage follows the instructors' interview (Chapter 3): beginners 3 sets of 8-12, advanced 4 sets of 12-15, 60 s rest; weight-loss classes add cardio.",
+  "classes": {
+    "Strength-Standard": {
+      "goal": "strength", "label": "strength", "modified": false,
+      "slots": [
+        ["bb_back_squat", "smith_squat", "goblet_squat", "leg_press"],
+        ["bb_bench", "db_bench", "chest_press"],
+        ["cable_row", "chest_supported_row", "tbar_row"],
+        ["bb_rdl", "db_rdl", "kb_rdl", "seated_leg_curl"],
+        ["machine_shoulder_press", "db_shoulder_press", "lateral_raise_machine"],
+        ["dead_bug", "cable_crunch"]
+      ]
+    },
+    "Strength-Modified-Lower": {
+      "goal": "strength", "label": "strength", "modified": true,
+      "slots": [
+        ["bb_back_squat", "goblet_squat", "leg_press"],
+        ["chest_press", "db_bench"],
+        ["cable_row", "chest_supported_row"],
+        ["hip_thrust", "glute_bridge"],
+        ["seated_leg_curl", "ball_leg_curl"],
+        ["dead_bug", "bird_dog"]
+      ]
+    },
+    "Strength-Modified-Upper": {
+      "goal": "strength", "label": "strength", "modified": true,
+      "slots": [
+        ["bb_back_squat", "goblet_squat", "leg_press"],
+        ["bb_bench", "chest_press", "cable_press"],
+        ["chest_supported_row", "cable_row"],
+        ["lat_pulldown", "high_pulley_pulldown"],
+        ["db_rdl", "seated_leg_curl"],
+        ["dead_bug", "bird_dog"]
+      ]
+    },
+    "WeightLoss-Standard": {
+      "goal": "weight_loss", "label": "fat-burn", "modified": false,
+      "slots": [
+        ["treadmill_intervals", "spin_intervals", "rowing_machine"],
+        ["kb_swing", "farmer_carry"],
+        ["goblet_squat", "leg_press"],
+        ["chest_press", "cable_press"],
+        ["cable_row", "chest_supported_row"],
+        ["jump_rope", "rowing_machine", "spin_intervals"],
+        ["dead_bug", "ball_crunch"]
+      ]
+    },
+    "WeightLoss-LowImpact": {
+      "goal": "weight_loss", "label": "fat-burn", "modified": true,
+      "slots": [
+        ["treadmill_intervals", "stationary_bike", "incline_walk", "spin_intervals"],
+        ["leg_press", "goblet_squat"],
+        ["chest_press", "cable_press"],
+        ["cable_row", "chest_supported_row"],
+        ["hip_thrust", "glute_bridge"],
+        ["dead_bug", "bird_dog"]
+      ]
+    },
+    "Wellness-Standard": {
+      "goal": "general_wellness", "label": "wellness", "modified": false,
+      "slots": [
+        ["incline_walk", "stationary_bike", "rowing_machine"],
+        ["leg_press", "goblet_squat"],
+        ["chest_press", "incline_press"],
+        ["lat_pulldown", "high_pulley_pulldown"],
+        ["face_pull", "reverse_fly"],
+        ["ball_crunch", "dead_bug"]
+      ]
+    },
+    "Wellness-Mobility": {
+      "goal": "general_wellness", "label": "mobility", "modified": true,
+      "slots": [
+        ["stationary_bike", "incline_walk"],
+        ["mat_mobility"],
+        ["glute_bridge", "hip_thrust"],
+        ["face_pull", "reverse_fly"],
+        ["chest_press", "cable_press"],
+        ["dead_bug", "bird_dog"]
+      ]
+    }
+  }
+}

@@ -8,6 +8,8 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Text, TextInput, View } from "react-native";
+import { SvgXml } from "react-native-svg";
+import { healthyHabitSvg } from "@/assets/healthy-habit";
 import { BigCard } from "@/components/SubScreen";
 import { BmiCard, InfoNote, Loading, NumberField, OptionChip, RadioRow, Section, StepScreen } from "@/components/health";
 import { useAuth } from "@/lib/auth";
@@ -129,13 +131,39 @@ export default function Onboarding() {
       });
       await refreshProfile?.();
       if (res.needs_consent) router.replace("/(member)/guardian-consent" as never);
-      else router.replace(editing ? "/(member)/profile" : "/(member)/home");
+      else if (editing) router.replace("/(member)/profile");
+      else setStep(4); // "Your profile is ready" (Figma 38:1123)
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
     }
   };
+
+  if (step === 4) {
+    const focus = conditions.length ? ` while accounting for your ${conditionsSummary(conditions)!.toLowerCase()}` : "";
+    return (
+      <StepScreen
+        step={3}
+        kicker="All set"
+        title="Your profile is ready"
+        subtitle={`Your plan will be tailored for ${goalLabel(goal).toLowerCase()} training${focus}.`}
+        button="Start training"
+        onButton={() => router.replace("/(member)/workout")}
+      >
+        <View className="items-center">
+          <SvgXml xml={healthyHabitSvg} width={350} height={320} style={{ maxWidth: "100%" }} />
+        </View>
+        <View
+          style={{ shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
+          className="w-full gap-[10px] rounded-[15px] border border-line bg-card/50 p-5"
+        >
+          <Text className="font-bold text-xl text-ink">Safety first</Text>
+          <Text className="font-medium text-sm text-ink-2">Follow each movement at your own pace and stop if something does not feel right.</Text>
+        </View>
+      </StepScreen>
+    );
+  }
 
   if (step === 1) {
     return (

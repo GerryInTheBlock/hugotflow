@@ -12,7 +12,7 @@ Algorithm for Hugot Gym in Silang, Cavite. BSCS thesis, Cavite State University 
 
 ## First-time setup (Windows)
 
-1. **Database.** Create the Supabase project and run the nine files in `supabase/migrations` (see `supabase/README.md`).
+1. **Database.** Create the Supabase project and run the ten files in `supabase/migrations` (see `supabase/README.md`).
 2. **App.**
    ```powershell
    cd client

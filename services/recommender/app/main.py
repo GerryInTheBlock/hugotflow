@@ -1,86 +1,137 @@
 """HugotFlow recommendation service (Chapter 3: Python 3.10+, FastAPI, scikit-learn).
 
-Iteration 0 ships the service shell so the app and the Engine Monitoring screen (Fig 17)
-can connect to it. The C4.5-style decision tree (DecisionTreeClassifier, criterion="entropy")
-is trained and wired into /recommend in Iteration 4.
+Endpoints
+  GET  /health     status, uptime and model version (Engine Monitoring, Fig 17)
+  GET  /model      model card: parameters, test metrics, IF-THEN rules
+  POST /recommend  builds today's safe plan for a member (Fig 18); body {"user_id": optional}
+                   Authorization: Bearer <the caller's Supabase login token>
+                   Members may only ask for themselves; instructors and the owner may ask for any member.
+
+Environment: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (host settings only), ALLOWED_ORIGINS (comma-separated, optional).
 """
 
 from __future__ import annotations
 
+import json
+import os
 import time
-from enum import Enum
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from fastapi import FastAPI
+import joblib
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-MODEL_VERSION = "not-trained"
+from .engine import PROGRAMS, Locked, recommend
+from .store import Store
+
+MODEL_DIR = Path(__file__).resolve().parents[1] / "model"
 STARTED_AT = time.time()
+MANILA = timezone(timedelta(hours=8))
 
-app = FastAPI(title="HugotFlow Recommender", version="0.1.0")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # tighten to the deployed web console URL before go-live
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
-
-class Goal(str, Enum):
-    strength = "strength"
-    weight_loss = "weight_loss"
-    general_wellness = "general_wellness"
+app = FastAPI(title="HugotFlow Recommender", version="1.0.0")
+origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()] or [
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
+]
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["*"])
 
 
-class Experience(str, Enum):
-    beginner = "beginner"
-    intermediate = "intermediate"
-    advanced = "advanced"
+def load_model():
+    path = MODEL_DIR / "model.joblib"
+    card_path = MODEL_DIR / "model_card.json"
+    if not path.exists():
+        return None, {"version": "not-trained"}
+    return joblib.load(path), json.loads(card_path.read_text(encoding="utf-8"))
 
 
-class Severity(str, Enum):
-    none = "none"
-    mild = "mild"
-    moderate = "moderate"
-    severe = "severe"
+MODEL, CARD = load_model()
+_store: Store | None = None
 
 
-JOINTS = {"knee", "lower_back", "shoulder", "hip", "ankle", "wrist_elbow"}
+def get_store() -> Store:
+    global _store
+    if _store is None:
+        _store = Store()
+    return _store
 
 
 class RecommendRequest(BaseModel):
-    user_id: str
-    age: int = Field(ge=16, le=100)
-    bmi: float = Field(gt=10, lt=70)
-    fitness_goal: Goal
-    experience_level: Experience
-    joint_conditions: list[str] = []
-    severity: Severity = Severity.none
-    daily_status: str = "good"  # good | soreness | pain
+    user_id: str | None = None
 
 
 @app.get("/health")
-def health() -> dict:
-    """Status for Fig 17: service up, uptime, model version."""
-    return {"status": "online", "uptime_s": round(time.time() - STARTED_AT), "model_version": MODEL_VERSION}
+def health():
+    return {
+        "status": "ok" if MODEL is not None else "model-missing",
+        "model_version": CARD.get("version"),
+        "trained_at": CARD.get("trained_at"),
+        "uptime_s": int(time.time() - STARTED_AT),
+    }
 
 
 @app.get("/model")
-def model_info() -> dict:
-    return {"model_version": MODEL_VERSION, "criterion": "entropy", "trained": False}
+def model_card():
+    return CARD
 
 
 @app.post("/recommend")
-def recommend(req: RecommendRequest) -> dict:
-    unknown = set(req.joint_conditions) - JOINTS
-    if unknown:
-        return {"error": f"Unsupported conditions: {sorted(unknown)}. Allowed: {sorted(JOINTS)}"}
-    # Severity gate (Fig 18): a severe constraint always raises an instructor alert.
-    high_risk = req.severity == Severity.severe or req.daily_status == "pain"
+def recommend_endpoint(body: RecommendRequest, authorization: str = Header(default=""), store: Store = Depends(get_store)):
+    started = time.perf_counter()
+    if MODEL is None:
+        raise HTTPException(503, "The recommendation model is not trained yet.")
+    if not store.configured:
+        raise HTTPException(503, "The service is missing its Supabase settings.")
+    token = authorization.removeprefix("Bearer ").strip()
+    caller = store.user_from_token(token) if token else None
+    if not caller:
+        raise HTTPException(401, "Sign in again.")
+    target = body.user_id or caller["user_id"]
+    if target != caller["user_id"] and caller["role"] not in ("instructor", "admin"):
+        raise HTTPException(403, "You can only get a plan for yourself.")
+
+    today = datetime.now(MANILA).date()
+    user = store.user(target)
+    if not user:
+        raise HTTPException(404, "Member not found.")
+    profile = store.profile(target)
+    daily = store.daily(target, today.isoformat())
+    try:
+        result = recommend(MODEL, profile=profile, user=user, daily=daily, equipment_rows=store.equipment(),
+                           exercise_rows=store.exercises(), today=today)
+    except Locked as e:
+        raise HTTPException(409, str(e)) from e
+
+    latency = int((time.perf_counter() - started) * 1000)
+    saved = store.record(
+        p_user_id=target,
+        p_class=result.program,
+        p_routine=result.routine,
+        p_skipped=result.skipped,
+        p_decision_path=result.decision_path,
+        p_features=result.features,
+        p_model_version=CARD.get("version"),
+        p_alert=result.alert,
+        p_alert_summary=result.alert_summary,
+        p_latency_ms=latency,
+    )
+    spec = PROGRAMS[result.program]
     return {
-        "model_version": MODEL_VERSION,
-        "instructor_alert": high_risk,
-        "predicted_class": None,
-        "routine": [],
-        "note": "Decision tree not trained yet (Iteration 4).",
+        "recommendation_id": saved.get("recommendation_id"),
+        "alert_id": saved.get("alert_id"),
+        "program": result.program,
+        "goal": spec["goal"],
+        "modified": spec["modified"],
+        "minutes": result.minutes,
+        "usable_equipment": result.usable_equipment,
+        "excluded_equipment": result.excluded_equipment,
+        "routine": result.routine,
+        "skipped": result.skipped,
+        "alert": result.alert,
+        "alert_summary": result.alert_summary,
+        "decision_path": result.decision_path,
+        "model_version": CARD.get("version"),
+        "latency_ms": latency,
+        "note": "Recommendations are suggestions. Stop any exercise that causes pain and tell the instructor.",
     }
