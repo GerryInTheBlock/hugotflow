@@ -31,7 +31,8 @@ STARTED_AT = time.time()
 MANILA = timezone(timedelta(hours=8))
 
 app = FastAPI(title="HugotFlow Recommender", version="1.0.0")
-origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()] or [
+# Render links the web console here by host name only ("hugotflow-web.onrender.com"), so add https:// when missing.
+origins = [o if "://" in o else f"https://{o}" for o in (x.strip() for x in os.environ.get("ALLOWED_ORIGINS", "").split(",")) if o] or [
     "http://localhost:8081",
     "http://127.0.0.1:8081",
 ]

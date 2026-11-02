@@ -11,7 +11,17 @@
     "ios": { "supportsTablet": true, "bundleIdentifier": "ph.hugotgym.hugotflow" },
     "android": { "package": "ph.hugotgym.hugotflow", "edgeToEdgeEnabled": true },
     "web": { "bundler": "metro", "output": "single", "name": "HugotFlow" },
-    "plugins": ["expo-router", "expo-font"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "HugotFlow uses your photos so you can attach a picture to an equipment report or your guardian consent.",
+          "cameraPermission": "HugotFlow uses the camera so you can take a picture of broken equipment or your guardian consent documents."
+        }
+      ]
+    ],
     "experiments": { "typedRoutes": true }
   }
 }
