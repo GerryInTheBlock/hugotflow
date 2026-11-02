@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { InfoNote } from "@/components/health";
 import { Screen } from "@/components/ui";
-import { GradientButton, GuidanceCard, OutlineButton, PlanTags, SkippedNote, planTitle, shadow, todayLabel } from "@/components/workout";
+import { GradientButton, GuidanceCard, OutlineButton, PlanTags, SkippedNote, StartWorkoutButton, planTitle, shadow, todayLabel } from "@/components/workout";
 import { useAuth } from "@/lib/auth";
 import { useMyHealth } from "@/lib/health";
 import { supabase } from "@/lib/supabase";
@@ -133,7 +133,7 @@ export default function WorkoutTab() {
         </View>
         {plan.instructor_alert ? <InfoNote icon="high-priority">The on-call instructor was alerted and will check this plan with you.</InfoNote> : null}
         <View className="gap-[10px]">
-          <GradientButton label="Start workout" onPress={() => router.push("/(member)/session" as never)} />
+          <StartWorkoutButton />
           <OutlineButton label="Review full plan" onPress={() => router.push("/(member)/plan" as never)} />
         </View>
       </View>

@@ -98,7 +98,19 @@ select 'R11a swap' as t, swap_exercise((select recommendation_id from workout_re
 select 'R11b unlisted' as t, swap_exercise((select recommendation_id from workout_recommendations where status = 'active'), 1, 'bb_back_squat');
 reset role;
 
--- R12 workout progress: 12 sets in the plan; start twice = same session; 2 sets done; finished
+-- R15 a workout cannot start before checking in at the gym today → false | ERROR "Check in at the front desk first…"
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R15a checked in?' as t, am_i_checked_in();
+select 'R15b start at home' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
+reset role;
+-- the front desk checks Tina in (as in migration 0008)
+insert into attendance_logs (user_id, method, recorded_by)
+values ('00000000-0000-0000-0000-0000000000b1', 'pin', '00000000-0000-0000-0000-00000000000b');
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R15c checked in?' as t, am_i_checked_in();
+reset role;
+
+-- R12 workout progress (after check-in): 12 sets in the plan; start twice = same session; 2 sets done; finished
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R12a start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
 select 'R12b same session' as t, count(distinct (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).session_id);

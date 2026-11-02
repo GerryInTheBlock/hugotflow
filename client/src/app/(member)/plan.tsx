@@ -7,7 +7,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { SubScreen } from "@/components/SubScreen";
 import { InfoNote } from "@/components/health";
-import { GradientButton, GuidanceCard, OutlineButton, PlanTags, SkippedNote, planTitle, shadow } from "@/components/workout";
+import { GradientButton, GuidanceCard, OutlineButton, PlanTags, SkippedNote, StartWorkoutButton, planTitle, shadow } from "@/components/workout";
 import { useAuth } from "@/lib/auth";
 import { useMyHealth } from "@/lib/health";
 import { supabase } from "@/lib/supabase";
@@ -121,7 +121,7 @@ export default function ReviewPlan() {
           ))}
           {error ? <Text className="text-center font-medium text-xs text-danger-ink">{error}</Text> : null}
           <View className="gap-[10px]">
-            <GradientButton label="Start workout" onPress={() => router.push("/(member)/session" as never)} />
+            <StartWorkoutButton />
             <OutlineButton
               label={swapping ? "Done swapping" : "Swap exercise"}
               onPress={() => {

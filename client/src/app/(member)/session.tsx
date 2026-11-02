@@ -51,6 +51,7 @@ export default function WorkoutSession() {
     return (
       <SubScreen title="Workout in Progress" backTo="/(member)/workout">
         <Text className="font-medium text-sm text-danger-ink">{error}</Text>
+        {error.startsWith("Check in") ? <GradientButton label="Show my entry QR" onPress={() => router.replace("/(member)/entry-pass")} /> : null}
       </SubScreen>
     );
   }

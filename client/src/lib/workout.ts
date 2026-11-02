@@ -134,6 +134,8 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
   return data as T;
 }
 
+/** A workout can only start after the member checked in at the gym today (migration 0011). */
+export const checkedInToday = () => rpc<boolean>("am_i_checked_in", {});
 export const startWorkout = (recId: string) => rpc<Session>("start_workout", { p_recommendation_id: recId });
 export const completeSet = (sessionId: string) => rpc<Session>("complete_set", { p_session_id: sessionId });
 export const finishWorkout = (sessionId: string) => rpc<Session>("finish_workout", { p_session_id: sessionId });

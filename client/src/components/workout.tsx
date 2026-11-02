@@ -1,10 +1,11 @@
 /** Pieces of the Figma workout screens (Workout 38:523, plan card 38:1167, Review full plan 38:879). */
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { manilaToday } from "@/lib/format";
 import { experienceLabel } from "@/lib/health";
-import { bookInstructor, PROGRAMS, planMinutes, type Plan, type Skipped } from "@/lib/workout";
+import { bookInstructor, checkedInToday, PROGRAMS, planMinutes, type Plan, type Skipped } from "@/lib/workout";
 import { brandGlow, brandGradient, colors } from "@/theme";
 import { Icon } from "./Icon";
 
@@ -108,6 +109,34 @@ export function GuidanceCard({ recId }: { recId?: string | null }) {
         }}
       />
       {msg ? <Text className="font-medium text-xs text-ink-2">{msg}</Text> : null}
+    </View>
+  );
+}
+
+/**
+ * "Start workout", only after checking in at the gym today (migration 0011). Before that the member sees why
+ * and a shortcut to the entry QR the front desk scans.
+ */
+export function StartWorkoutButton() {
+  const [inGym, setInGym] = useState<boolean | null>(null);
+  useFocusEffect(
+    useCallback(() => {
+      checkedInToday()
+        .then(setInGym)
+        .catch(() => setInGym(false));
+    }, []),
+  );
+  if (inGym === null) return <GradientButton label="Start workout" onPress={() => {}} busy />;
+  if (inGym) return <GradientButton label="Start workout" onPress={() => router.push("/(member)/session" as never)} />;
+  return (
+    <View className="gap-[10px]">
+      <View className="flex-row items-start gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+        <Icon name="qr-code" size={25} />
+        <Text className="flex-1 font-medium text-sm text-ink-2">
+          Check in at the front desk first. Your workout starts once you are at Hugot Gym today.
+        </Text>
+      </View>
+      <GradientButton label="Show my entry QR" onPress={() => router.push("/(member)/entry-pass")} />
     </View>
   );
 }
