@@ -189,3 +189,18 @@ Built from 38:523, 38:1167, 38:879, 38:976, 38:1006, 38:1123 (member), 38:89, 38
 New tables `workout_sessions`, `recommendation_corrections`, `coaching_requests`. New fields: `exercises.code / pattern / cue /
 substitutes`, `workout_recommendations.status / skipped / features / latency_ms / source / instructor_note`,
 `high_risk_alerts.resolution_note`, `gym_settings.coaching_url`.
+
+## Figma updated to match the built app (Iteration 4 fixes)
+New section on page "Dark theme · Hugot Gym": **Built app · Iteration 4 updates (matches the code)**, below the original screens. The originals are kept unchanged for comparison.
+
+| Frame | Change | Paper link |
+|---|---|---|
+| Workout in Progress · set timer / rest countdown | Set time and rest timers; Complete set unlocks when the set time is up (0012) | Fig 13 workout plan, Scope (guided workout) |
+| Workout in Progress · Machine busy | Swap to a safe alternative or do it later (0014) | Scope: equipment availability in recommendations |
+| Finish Workout · after-workout check | "How is your body now?", pain raises an instructor alert (0015) | IPO feedback loop to the on-call instructor |
+| Workout tab · check in first | Workout starts only after today's check-in (0011) | Attendance module feeds the workout module |
+| Workout tab · today's workout done | One recommended workout per day; the next plan comes from tomorrow's body check (0017) | Fig 13 daily health status → workout plan |
+| Report detail | Member sees outcome and staff notes (0013) | Equipment reporting (Fig 13) |
+| Instructor · member health review | Health profile, daily status, recent workouts with how each felt | Instructor review of health profiles |
+| Login | One sign-in for everyone, email only | Users of the system (owner, staff, instructors, members) |
+| Equipment (web) | 10 per page, staff notes visible to the reporter | Equipment maintenance module |
