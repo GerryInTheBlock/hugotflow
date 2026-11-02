@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { manilaToday } from "@/lib/format";
 import { experienceLabel } from "@/lib/health";
-import { bookInstructor, checkedInToday, PROGRAMS, planMinutes, type Plan, type Skipped } from "@/lib/workout";
+import { bookInstructor, checkedInToday, doneToday, PROGRAMS, planMinutes, type Plan, type Skipped } from "@/lib/workout";
 import { brandGlow, brandGradient, colors } from "@/theme";
 import { Icon } from "./Icon";
 
@@ -118,16 +118,30 @@ export function GuidanceCard({ recId }: { recId?: string | null }) {
  * and a shortcut to the entry QR the front desk scans.
  */
 export function StartWorkoutButton() {
-  const [inGym, setInGym] = useState<boolean | null>(null);
+  const [state, setState] = useState<"loading" | "away" | "ready" | "done">("loading");
   useFocusEffect(
     useCallback(() => {
-      checkedInToday()
-        .then(setInGym)
-        .catch(() => setInGym(false));
+      Promise.all([doneToday(), checkedInToday()])
+        .then(([done, inGym]) => setState(done ? "done" : inGym ? "ready" : "away"))
+        .catch(() => setState("away"));
     }, []),
   );
-  if (inGym === null) return <GradientButton label="Start workout" onPress={() => {}} busy />;
-  if (inGym) return <GradientButton label="Start workout" onPress={() => router.push("/(member)/session" as never)} />;
+  if (state === "loading") return <GradientButton label="Start workout" onPress={() => {}} busy />;
+  if (state === "ready") return <GradientButton label="Start workout" onPress={() => router.push("/(member)/session" as never)} />;
+  if (state === "done") {
+    // One recommended workout per day (migration 0017): tomorrow's check-in builds the next plan.
+    return (
+      <View className="flex-row items-start gap-[10px] rounded-field border border-ok/40 bg-ok/10 p-[15px]">
+        <Icon name="check-mark" size={25} color={colors["ok-ink"]} />
+        <View className="flex-1 gap-1">
+          <Text className="font-bold text-sm text-ok-ink">Today’s workout is done</Text>
+          <Text className="font-medium text-sm text-ink-2">
+            Rest and recover. Come back tomorrow: your next plan is built from tomorrow’s body check and how today felt.
+          </Text>
+        </View>
+      </View>
+    );
+  }
   return (
     <View className="gap-[10px]">
       <View className="flex-row items-start gap-[10px] rounded-field bg-white/[0.06] p-[15px]">

@@ -163,6 +163,9 @@ select 'R17b order' as t, string_agg(x->>'name', ' > ' order by i)
 -- R17c the last exercise cannot move → ERROR "This is already the last exercise"
 select 'R17c last' as t, defer_exercise((select recommendation_id from workout_recommendations where status = 'active'), 3);
 -- R17d after starting an exercise it cannot move → ERROR "You can only move an exercise before starting it"
+reset role;
+update workout_sessions set finished_at = now() - interval '1 day' where status = 'finished';  -- earlier workouts were on another day
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R17d start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_done;
 reset role;
 update workout_sessions set started_at = now() - interval '1 minute' where status = 'in_progress';
@@ -187,6 +190,9 @@ select 'R18e coach told' as t, count(*) from notifications
 -- R19 an instructor shortens the plan while Tina is mid-workout (migration 0016): the open workout follows the plan
 --     → total 3 after the edit; once 3 sets are done, Complete set returns 3 of 3 (no "Set 4 of 3")
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+reset role;
+update workout_sessions set finished_at = now() - interval '1 day' where status = 'finished';  -- earlier workouts were on another day
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R19a start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
 reset role;
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000c';
@@ -197,4 +203,15 @@ select 'R19c totals' as t, sets_done, sets_total from workout_sessions where sta
 update workout_sessions set sets_done = 3 where status = 'in_progress';
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R19d complete' as t, s.sets_done, s.sets_total from complete_set((select session_id from workout_sessions where status = 'in_progress')) s;
+reset role;
+
+-- R20 one workout per day (migration 0017): Tina finishes today's workout → done today | starting again → ERROR
+update workout_sessions set status = 'finished', finished_at = now(), feeling = 'good' where status = 'in_progress';
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R20a done today?' as t, am_i_done_today();
+select 'R20b start again' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
+reset role;
+-- R20c Juan has not worked out today → false
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000e';
+select 'R20c Juan done?' as t, am_i_done_today();
 reset role;
