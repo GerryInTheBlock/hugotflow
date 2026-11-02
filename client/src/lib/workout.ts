@@ -43,7 +43,7 @@ export type Plan = {
   created_at: string;
 };
 
-export type Session = { session_id: string; recommendation_id: string; status: "in_progress" | "finished"; sets_total: number; sets_done: number; started_at: string; finished_at: string | null; last_set_at: string | null };
+export type Session = { session_id: string; recommendation_id: string; status: "in_progress" | "finished"; sets_total: number; sets_done: number; started_at: string; finished_at: string | null; last_set_at: string | null; feeling?: "good" | "soreness" | "pain" | null; feeling_area?: string | null; feeling_note?: string | null };
 
 /** Mirrors services/recommender/app/programs.json. */
 export const PROGRAMS: Record<string, { goal: string; title: string; modified: boolean }> = {
@@ -162,7 +162,9 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 export const checkedInToday = () => rpc<boolean>("am_i_checked_in", {});
 export const startWorkout = (recId: string) => rpc<Session>("start_workout", { p_recommendation_id: recId });
 export const completeSet = (sessionId: string) => rpc<Session>("complete_set", { p_session_id: sessionId });
-export const finishWorkout = (sessionId: string) => rpc<Session>("finish_workout", { p_session_id: sessionId });
+/** Finish with how the body feels now (migration 0015); pain raises a High-Risk Alert for the instructors. */
+export const finishWorkout = (sessionId: string, feeling: "good" | "soreness" | "pain", area?: string | null, note?: string | null) =>
+  rpc<Session>("finish_workout", { p_session_id: sessionId, p_feeling: feeling, p_area: area ?? null, p_note: note ?? null });
 /** "Machine busy? Do it later": move an exercise not started yet to the end of today's plan (migration 0014). */
 export const deferExercise = (recId: string, index: number) => rpc<PlanItem>("defer_exercise", { p_recommendation_id: recId, p_index: index });
 export const swapExercise = (recId: string, index: number, code: string) => rpc<PlanItem>("swap_exercise", { p_recommendation_id: recId, p_index: index, p_code: code });

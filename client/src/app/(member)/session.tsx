@@ -5,12 +5,13 @@
  */
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
+import { InfoNote, OptionChip, RadioRow } from "@/components/health";
 import { LinearGradient } from "expo-linear-gradient";
 import { SubScreen } from "@/components/SubScreen";
 import { GradientButton, OutlineButton, shadow } from "@/components/workout";
 import { useAuth } from "@/lib/auth";
-import { useMyHealth } from "@/lib/health";
+import { BODY_AREAS, useMyHealth } from "@/lib/health";
 import {
   activePlan,
   clock,
@@ -39,6 +40,10 @@ export default function WorkoutSession() {
   // "Machine busy?" panel (Fig 13b swap; migration 0014 "Do it later")
   const [busyOpen, setBusyOpen] = useState(false);
   const [alts, setAlts] = useState<{ code: string; name: string; equipment: string }[] | null>(null);
+  // After-workout feedback (migration 0015)
+  const [feeling, setFeeling] = useState<"good" | "soreness" | "pain" | null>(null);
+  const [area, setArea] = useState<string | null>(null);
+  const [note, setNote] = useState("");
 
   // One tick per second drives the set and rest countdowns.
   useEffect(() => {
@@ -129,26 +134,62 @@ export default function WorkoutSession() {
   };
 
   const finish = async () => {
+    setNotice(null);
+    if (!feeling) return setNotice("Tell us how your body feels.");
+    if (feeling !== "good" && !area) return setNotice("Choose where you feel it.");
     setBusy(true);
     try {
-      if (session.status !== "finished") await finishWorkout(session.session_id);
+      if (session.status !== "finished") await finishWorkout(session.session_id, feeling, area, note);
       router.replace("/(member)/workout");
     } catch (e) {
-      setError((e as Error).message);
+      setNotice((e as Error).message);
       setBusy(false);
     }
   };
 
+  // Figma "Finish Workout" (38:1006): how the body feels after the session, for the member's next plan and the instructor.
   if (finished) {
     return (
-      <SubScreen title="Workout complete" backTo="/(member)/workout">
-        <View style={[shadow, { gap: 15 }]} className="rounded-card border border-line bg-card p-5">
-          <Text className="font-bold text-2xl text-ink">Great work!</Text>
-          <Text className="font-medium text-base text-ink-2">
-            {session.sets_total} sets across {plan.routine.length} exercises. Rest, drink water, and tell your instructor if anything hurt.
-          </Text>
+      <SubScreen kicker={`Workout complete · ${session.sets_total} sets across ${plan.routine.length} exercises`} title="How is your body now?" backTo="/(member)/workout">
+        <View className="gap-[15px]">
+          {(
+            [
+              ["good", "Feeling good"],
+              ["soreness", "Some soreness"],
+              ["pain", "Pain or limitation"],
+            ] as const
+          ).map(([v, label]) => (
+            <RadioRow key={v} label={label} on={feeling === v} onPress={() => setFeeling(v)} />
+          ))}
         </View>
-        <GradientButton label="Finish workout" onPress={finish} busy={busy} />
+        {feeling && feeling !== "good" ? (
+          <View className="gap-[10px] py-[10px]">
+            <Text className="font-bold text-base text-ink">Where do you feel it?</Text>
+            <View className="flex-row flex-wrap gap-[10px]">
+              {BODY_AREAS.map((a) => (
+                <OptionChip key={a} label={a} on={area === a} onPress={() => setArea(a)} />
+              ))}
+            </View>
+          </View>
+        ) : null}
+        <View className="gap-[10px]">
+          <Text className="font-bold text-base text-ink">Optional note</Text>
+          <TextInput
+            value={note}
+            onChangeText={setNote}
+            multiline
+            textAlignVertical="top"
+            placeholder="Tell your instructor anything useful"
+            placeholderTextColor={colors["ink-2"]}
+            className="h-[175px] rounded-card border border-line bg-card p-5 font-medium text-base text-ink"
+            style={{ outlineStyle: "none" } as object}
+          />
+        </View>
+        <InfoNote icon="high-priority" size={16}>
+          Pain or limitation may trigger instructor review.
+        </InfoNote>
+        {notice ? <Text className="text-center font-medium text-xs text-danger-ink">{notice}</Text> : null}
+        <GradientButton label="Confirm and finish workout" onPress={finish} busy={busy} />
       </SubScreen>
     );
   }

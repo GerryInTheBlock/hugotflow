@@ -136,7 +136,7 @@ reset role;
 update workout_sessions set last_set_at = now() - interval '2 minutes';  -- rested and did the second set
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
 select 'R12d sets' as t, (complete_set((select session_id from workout_sessions limit 1))).sets_done;
-select 'R12e finished' as t, (finish_workout((select session_id from workout_sessions limit 1))).status;
+select 'R12e finished' as t, (finish_workout((select session_id from workout_sessions limit 1), 'good')).status;
 select 'R12f sessions' as t, count(*) from workout_sessions;
 reset role;
 
@@ -170,3 +170,16 @@ set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000
 select 'R17e one set' as t, (complete_set((select session_id from workout_sessions where status = 'in_progress'))).sets_done;
 select 'R17f move started' as t, defer_exercise((select recommendation_id from workout_recommendations where status = 'active'), 0);
 reset role;
+
+-- R18 after-workout feedback (migration 0015): pain needs a body area; then finished | pain | Knee;
+--     today's status becomes pain; a High-Risk Alert "Pain after workout: Knee" is raised and the coach is told
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R18a no area' as t, (finish_workout((select session_id from workout_sessions where status = 'in_progress'), 'pain')).status;
+select 'R18b finished' as t, s.status, s.feeling, s.feeling_area
+  from finish_workout((select session_id from workout_sessions where status = 'in_progress'), 'pain', 'Knee', 'Sharp pain on the last squat') s;
+reset role;
+select 'R18c today' as t, status, body_area from daily_status where user_id = '00000000-0000-0000-0000-0000000000b1';
+select 'R18d alert' as t, status, constraint_summary from high_risk_alerts
+ where member_id = '00000000-0000-0000-0000-0000000000b1' and constraint_summary like 'Pain after workout%';
+select 'R18e coach told' as t, count(*) from notifications
+ where user_id = '00000000-0000-0000-0000-00000000000c' and body like '%Pain after workout%';
