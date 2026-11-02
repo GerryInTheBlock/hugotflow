@@ -40,7 +40,12 @@ class Store:
         return bool(self.url and self.key)
 
     def _h(self, **extra) -> dict:
-        return {"apikey": self.key, "Authorization": f"Bearer {self.key}", **extra}
+        # New Supabase secret keys (sb_secret_…) are not JWTs and go in the apikey header only;
+        # a legacy service_role JWT (eyJ…) is also sent as the bearer token.
+        h = {"apikey": self.key, **extra}
+        if self.key.startswith("eyJ"):
+            h["Authorization"] = f"Bearer {self.key}"
+        return h
 
     def _get(self, table: str, params: dict) -> list[dict]:
         r = self.http.get(f"{self.url}/rest/v1/{table}", params=params, headers=self._h())
