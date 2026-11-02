@@ -11,14 +11,27 @@ import { backgroundGradient } from "@/theme";
 import { Icon } from "./Icon";
 import { Logo } from "./ui";
 
-export function SubScreen({ title, kicker, children, gap = 15 }: { title: string; kicker?: string; children: ReactNode; gap?: number }) {
+export function SubScreen({
+  title,
+  kicker,
+  children,
+  gap = 15,
+  backTo = "/(member)/home",
+}: {
+  title: string;
+  kicker?: string;
+  children: ReactNode;
+  gap?: number;
+  /** Where Back goes when there is no history (e.g. the page was opened directly). */
+  backTo?: string;
+}) {
   return (
     <LinearGradient colors={backgroundGradient.colors} locations={backgroundGradient.locations} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerClassName="px-5 pb-10 pt-5">
           <View className="flex-row items-center justify-between">
             <Pressable
-              onPress={() => (router.canGoBack() ? router.back() : router.replace("/(member)/home"))}
+              onPress={() => (router.canGoBack() ? router.back() : router.replace(backTo as never))}
               hitSlop={10}
               accessibilityRole="button"
               accessibilityLabel="Back"

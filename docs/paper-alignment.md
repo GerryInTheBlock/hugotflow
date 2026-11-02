@@ -117,3 +117,39 @@ Still needs the owner: a real webcam scan test on the gym laptop, and photo uplo
 ### ERD changes to show in Figure 20 (Iteration 2)
 
 No new tables. `attendance_logs` uses `client_uuid` (one row per offline check-in) and `synced_from_offline`.
+
+## Iteration 3: Health Profile and Equipment Management (Nov 2026)
+
+| Paper requirement | Where | Status |
+| --- | --- | --- |
+| Health profile inputs: age, height + weight → BMI, goal (Strength / Weight Loss / General Wellness), experience level (Scope; Fig 6, 12b) | Member onboarding steps 1–3, `save_health_profile` (BMI computed in the database) | Done, tested (H2, H11) |
+| Only the 6 joint/bone limitations: knee, lower back, shoulder, hip, ankle, wrist/elbow (Scope, Limitations) | Step 2 chips; `valid_joint_conditions` check | Done, tested (T4) |
+| Minimum age 16 (Scope) | Step 1 birthdate + `users_min_age` trigger | Done, tested (H1) |
+| Under 18 with a limitation needs guardian consent + medical certificate before any recommendation (Scope) | Guardian consent screen (photos to private storage), instructor Approve / Ask to resubmit (`verify_guardian_consent`) | Done, tested (H5–H10, H15) |
+| Privacy notice (Fig 12b) | Step 2 notice; health data in `health_profiles`, never shown to the front desk | Done, tested (H7) |
+| One-tap daily status: feeling good / soreness / pain + body area + note (Fig 13a) | Profile → Daily status, `save_daily_status` (one per Manila day) | Done, tested (H14) |
+| Instructor reviews health profiles (Fig 6) | Instructor Members (Needs review / Safe plans) → member health review, `mark_profile_reviewed` | Done, tested (H12, H13) |
+| Member reports an issue: category, safety-risk flag, description, photo → Pending Review (Fig 8, 13c) | Report tab → Report a problem (photo to private storage) | Done, tested (E1, E2) |
+| Staff verify: Out of Order (left out of recommendations) / Resolved / Keep Available, with staff notes (Fig 15) | Console > Equipment, `review_equipment_report`, `restore_equipment` | Done, tested (E3–E7) |
+| Owner views equipment status (Fig 8) | Console > Equipment (owner and staff) | Done |
+| Add / edit equipment by owner or staff (Appendix 3) | Console > Equipment > Add equipment | Done, tested (E8) |
+
+### Matched to Figma (Iteration 3)
+
+Built from frames 38:2125 / 38:2170 (Onboarding), 38:1895 (Guardian consent), 38:678 (Profile),
+38:600 / 38:1038 / 38:1085 (Report), 38:165 (instructor Members) and 38:3091 (Equipment). Differences on purpose:
+
+- Onboarding Step 3 has no frame: it is a summary to confirm. The first workout plan joins it in Iteration 4.
+- One severity question for the most serious condition, because the ERD stores one severity (`severe_condition_flag`).
+- Guardian consent note says "until your instructor verifies" (the frame says "staff"): the owner chose the on-call instructor.
+- "Update status" opens the daily-status choices inside the card (no frame for it).
+- Report a problem: a "Choose from gallery" link under the camera box, for phones without a camera permission or the laptop.
+- Instructor Members: "View Routine" becomes "Open Profile" until routines exist (Iteration 4). The "Status" button filters to
+  members who reported soreness or pain today.
+- Profile pencils (edit photo/name) are not active yet: photo uploads for profiles are still open with the owner.
+- The instructor's own Profile (38:2243, with assigned alerts) comes with High-Risk Alerts in Iteration 4.
+
+### ERD changes to show in Figure 20 (Iteration 3)
+
+Added fields `health_profiles.training_background` (Step 1), `health_profiles.reviewed_by` / `reviewed_at` (instructor review),
+`guardian_consents.status` / `review_note` (Approve / Ask to resubmit).
