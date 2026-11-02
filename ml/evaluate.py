@@ -72,7 +72,7 @@ def main() -> None:
         vals = list(X_train[col])
         if col in ("age", "bmi"):
             g, s, r, t = gain_ratio_continuous(vals, labels)
-            rows.append((col + f" (≤ {t})", g, s, r))
+            rows.append((col + f" (<= {t})", g, s, r))
         else:
             g, s, r = gain_ratio_discrete(vals, labels)
             rows.append((col, g, s, r))
