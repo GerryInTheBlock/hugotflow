@@ -97,3 +97,11 @@ export async function addNote(reportId: string, authorId: string, note: string) 
   const { error } = await supabase.from("equipment_report_notes").insert({ report_id: reportId, author_id: authorId, note: note.trim() });
   if (error) throw new Error(error.message);
 }
+
+/** Staff notes on one of my own reports (my_report_notes, migration 0013): first name and role of the author. */
+export type MemberNote = { note_id: string; note: string; created_at: string; author: string | null; author_role: string | null };
+export async function myReportNotes(reportId: string) {
+  const { data, error } = await supabase.rpc("my_report_notes", { p_report_id: reportId });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as MemberNote[];
+}

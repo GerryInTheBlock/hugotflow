@@ -223,6 +223,7 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
 
           <View className="gap-2">
             <Text className="font-bold text-base text-ink">Staff notes</Text>
+            <Text className="font-medium text-[11px] text-ink-2">The member who reported this sees these notes in the app.</Text>
             {notes.map((n) => (
               <View key={n.note_id} className="gap-[2px] rounded-field bg-white/[0.06] p-[10px]">
                 <Text className="font-semibold text-[10px] text-ink-2">
@@ -285,11 +286,45 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
   );
 }
 
+const PAGE_SIZE = 10;
+
+/** "1–10 of 60" with Previous / page numbers / Next, in the console's chip style. */
+function Pager({ page, pages, total, onPage }: { page: number; pages: number; total: number; onPage: (p: number) => void }) {
+  const from = page * PAGE_SIZE + 1;
+  const to = Math.min(total, from + PAGE_SIZE - 1);
+  const btn = (label: string, target: number, on = false, disabled = false) => (
+    <Pressable
+      key={label}
+      onPress={() => onPage(target)}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ selected: on, disabled }}
+      style={{ opacity: disabled ? 0.4 : 1 }}
+      className={`min-w-[32px] items-center rounded-chip px-[10px] py-[5px] ${on ? "bg-brand" : "border border-line bg-card"}`}
+    >
+      <Text className="font-semibold text-xs text-ink">{label}</Text>
+    </Pressable>
+  );
+  return (
+    <View className="flex-row flex-wrap items-center justify-between gap-3">
+      <Text className="font-medium text-xs text-ink-2">
+        {from}–{to} of {total}
+      </Text>
+      <View className="flex-row flex-wrap gap-[6px]">
+        {btn("Previous", page - 1, false, page === 0)}
+        {Array.from({ length: pages }, (_, i) => btn(String(i + 1), i, i === page))}
+        {btn("Next", page + 1, false, page >= pages - 1)}
+      </View>
+    </View>
+  );
+}
+
 export default function EquipmentPage() {
   const [equipment, setEquipment] = useState<Equipment[] | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [tab, setTab] = useState<Tab>("pending_review");
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -330,6 +365,12 @@ export default function EquipmentPage() {
     // Machines with reports first, newest first.
     return [...list].sort((a, b) => (b.report?.created_at ?? "").localeCompare(a.report?.created_at ?? "") || a.name.localeCompare(b.name));
   }, [rows, tab, q]);
+
+  // 10 machines per page; a new tab or search starts again at page 1.
+  const pages = Math.max(1, Math.ceil(shown.length / PAGE_SIZE));
+  useEffect(() => setPage(0), [tab, q]);
+  const safePage = Math.min(page, pages - 1);
+  const pageRows = shown.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   // Open the newest pending report when nothing is selected.
   useEffect(() => {
@@ -379,14 +420,17 @@ export default function EquipmentPage() {
             {equipment === null ? (
               <Empty>Loading…</Empty>
             ) : (
-              <DataTable
-                variant="log"
-                columns={columns}
-                rows={shown}
-                rowKey={(r) => String(r.equipment_id)}
-                onRowPress={(r) => setSelected(r.equipment_id)}
-                empty={tab === "pending_review" ? "No reports waiting. The floor is clear." : tab === "out_of_order" ? "Nothing is Out of Order." : "No equipment found."}
-              />
+              <>
+                <DataTable
+                  variant="log"
+                  columns={columns}
+                  rows={pageRows}
+                  rowKey={(r) => String(r.equipment_id)}
+                  onRowPress={(r) => setSelected(r.equipment_id)}
+                  empty={tab === "pending_review" ? "No reports waiting. The floor is clear." : tab === "out_of_order" ? "Nothing is Out of Order." : "No equipment found."}
+                />
+                {shown.length > PAGE_SIZE ? <Pager page={safePage} pages={pages} total={shown.length} onPage={setPage} /> : null}
+              </>
             )}
           </MainPanel>
         }

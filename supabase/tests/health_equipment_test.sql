@@ -145,6 +145,13 @@ select 'E4d Juan notified', title from notifications where user_id = '00000000-0
 -- E5 members do not see staff notes → 0
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000e';
 select 'E5 member reads notes', count(*) from equipment_report_notes;
+-- E5b … except, through my_report_notes (migration 0013), the notes on his own report → 1 | Ana | staff
+select 'E5b reporter sees notes' as t, count(*) as notes, max(author) as author, max(author_role) as role
+  from my_report_notes((select report_id from equipment_reports where description = 'Seat pin is stuck'));
+reset role;
+-- E5c another member gets nothing for that report → 0
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'E5c other member' as t, count(*) from my_report_notes((select report_id from equipment_reports where description = 'Seat pin is stuck'));
 reset role;
 
 -- E6 staff restore it after repair → available | resolved | 2 notifications for Juan
