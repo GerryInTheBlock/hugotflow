@@ -5,7 +5,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { clockTime, daysUntil, manilaToday } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import { brandGlow, brandGradient } from "@/theme";
@@ -126,7 +126,8 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
       className="grow rounded-field border border-divider bg-white/[0.04] p-[15px]"
     >
       <PanelHeader icon="checked-user" title="Live attendance" subtitle="Today's check-ins" />
-      <View className="gap-[10px] border-r border-line-strong pr-[15px]">
+      {/* Scrolls inside the panel (about 6 rows tall) so a busy day doesn't stretch the page. */}
+      <ScrollView style={{ maxHeight: 420 }} contentContainerClassName="gap-[10px] border-r border-line-strong pr-[15px]" showsVerticalScrollIndicator>
         {visits === null ? <Empty>Loading…</Empty> : visits.length === 0 ? <Empty>No check-ins yet today.</Empty> : null}
         {visits?.map((v) => (
           <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-white/[0.06] px-5">
@@ -140,7 +141,7 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
             <Text className="font-medium text-sm text-ink-2">{clockTime(v.checkin_at)}</Text>
           </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 }
