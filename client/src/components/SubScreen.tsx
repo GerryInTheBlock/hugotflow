@@ -17,6 +17,7 @@ export function SubScreen({
   children,
   gap = 15,
   backTo = "/(member)/home",
+  plainTitle = false,
 }: {
   title: string;
   kicker?: string;
@@ -24,6 +25,8 @@ export function SubScreen({
   gap?: number;
   /** Where Back goes when there is no history (e.g. the page was opened directly). */
   backTo?: string;
+  /** 24 px bold title (workout screens) instead of the 32 px italic one. */
+  plainTitle?: boolean;
 }) {
   return (
     <LinearGradient colors={backgroundGradient.colors} locations={backgroundGradient.locations} style={{ flex: 1 }}>
@@ -43,7 +46,7 @@ export function SubScreen({
           <View style={{ gap }} className="px-[15px] py-[17px]">
             <View>
               {kicker ? <Text className="font-medium text-base text-ink-2">{kicker}</Text> : null}
-              <Text className="font-extrabold-italic text-[32px] leading-[44px] text-ink">{title}</Text>
+              <Text className={plainTitle ? "font-bold text-2xl text-ink" : "font-extrabold-italic text-[32px] leading-[44px] text-ink"}>{title}</Text>
             </View>
             {children}
           </View>

@@ -18,6 +18,7 @@ const sources = {
   "checked-user": require("../../assets/icons/checked-user.png"),
   dumbbell: require("../../assets/icons/dumbbell.png"),
   "drop-down": require("../../assets/icons/drop-down.png"),
+  error: require("../../assets/icons/error.png"),
   forward: require("../../assets/icons/forward.png"),
   "high-priority": require("../../assets/icons/high-priority.png"),
   "line-chart": require("../../assets/icons/line-chart.png"),
