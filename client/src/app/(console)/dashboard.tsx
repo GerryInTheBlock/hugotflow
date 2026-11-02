@@ -15,21 +15,48 @@ import { crowdByHour, dashboardSummary, monthShort, peakWindow, revenueByMonth, 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const whole = (n: number) => peso(n).replace(/\.00$/, "");
 
-function StatCard({ label, value, sub, subColor, to }: { label: string; value: string; sub: string; subColor?: string; to: Href }) {
+/** Figma stat card: label + round arrow button, big figure, coloured footnote. Spacing is set in style so it always applies. */
+function StatCard({ label, value, sub, subColor, accent, to }: { label: string; value: string; sub: string; subColor?: string; accent?: string; to: Href }) {
+  const [hover, setHover] = useState(false);
   return (
     <Pressable
       onPress={() => router.push(to)}
+      onHoverIn={() => setHover(true)}
+      onHoverOut={() => setHover(false)}
       accessibilityRole="button"
-      accessibilityLabel={`${label}: ${value}`}
-      style={{ minWidth: 170 }}
-      className="flex-1 gap-[10px] rounded-[15px] border border-white bg-white/[0.04] pb-[10px] pl-[10px] pr-[6px] pt-[6px]"
+      accessibilityLabel={`${label}: ${value}. ${sub}`}
+      style={{
+        flexGrow: 1,
+        flexBasis: 200,
+        minWidth: 190,
+        paddingHorizontal: 18,
+        paddingVertical: 16,
+        gap: 6,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: hover ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)",
+        backgroundColor: hover ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)",
+        shadowColor: "#000",
+        shadowOpacity: 0.35,
+        shadowRadius: 18,
+        shadowOffset: { width: 0, height: 6 },
+        overflow: "hidden",
+      }}
     >
-      <View className="flex-row items-center justify-between">
-        <Text className="font-medium text-xs text-ink-2">{label}</Text>
-        <Icon name="forward" size={30} />
+      {/* thin brand line along the top, like the red accents elsewhere in the console */}
+      <View style={{ position: "absolute", left: 0, right: 0, top: 0, height: 3, backgroundColor: accent ?? "#E3061B", opacity: 0.85 }} />
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <Text className="font-semibold text-[13px] text-ink-2">{label}</Text>
+        <View
+          style={{ width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", backgroundColor: hover ? "#E3061B" : "rgba(255,255,255,0.08)" }}
+        >
+          <Icon name="forward" size={18} color="#FFFFFF" />
+        </View>
       </View>
-      <Text className="-mt-[10px] font-bold text-2xl text-ink">{value}</Text>
-      <Text style={subColor ? { color: subColor } : undefined} className="font-medium text-xs text-ink-2">
+      <Text numberOfLines={1} style={{ fontSize: 30, lineHeight: 38 }} className="font-bold text-ink">
+        {value}
+      </Text>
+      <Text numberOfLines={1} style={subColor ? { color: subColor } : undefined} className="font-medium text-xs text-ink-2">
         {sub}
       </Text>
     </Pressable>
@@ -86,7 +113,7 @@ export default function Dashboard() {
               <StatCard
                 label="Today’s check-ins"
                 value={s ? String(s.checkins_today) : "—"}
-                sub={change == null ? "vs last week: no visits" : `${change >= 0 ? "+" : ""}${change}% vs last week`}
+                sub={change == null ? "No visits this day last week" : `${change >= 0 ? "▲ +" : "▼ "}${change}% vs last week`}
                 subColor={change == null ? undefined : change >= 0 ? "#5CF000" : "#FF4D4F"}
                 to="/(console)/attendance"
               />
@@ -101,8 +128,9 @@ export default function Dashboard() {
               <StatCard
                 label="Equipment reports"
                 value={s ? String(s.equipment_pending) : "—"}
-                sub={s && s.equipment_pending > 0 ? "Needs Attention!" : "All clear"}
-                subColor={s && s.equipment_pending > 0 ? "#FF4D4F" : undefined}
+                sub={s && s.equipment_pending > 0 ? "Needs Attention!" : "✓ All machines clear"}
+                subColor={s && s.equipment_pending > 0 ? "#FF4D4F" : "#4ADE80"}
+                accent={s && s.equipment_pending > 0 ? "#FF4D4F" : "#3F3F46"}
                 to="/(console)/equipment"
               />
             </View>
