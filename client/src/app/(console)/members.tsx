@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import {
   AlertPill,
   Chips,
@@ -159,6 +159,8 @@ export default function MembersPage() {
                 />
                 {error ? <Note tone="danger">{error}</Note> : null}
                 {rows === null ? <Empty>Loading…</Empty> : shown.length === 0 ? <Empty>No accounts found.</Empty> : null}
+                {/* The member cards scroll inside the panel so a growing member list never stretches the page. */}
+                <ScrollView style={{ maxHeight: 640 }} nestedScrollEnabled showsVerticalScrollIndicator>
                 <View className="flex-row flex-wrap gap-[10px] px-[15px] pb-[15px]">
                   {shown.map((r) => (
                     <View key={r.user_id} style={{ width: wide ? "48.5%" : "100%" }}>
@@ -176,6 +178,7 @@ export default function MembersPage() {
                     </View>
                   ))}
                 </View>
+                </ScrollView>
               </>
             )}
           </MainPanel>

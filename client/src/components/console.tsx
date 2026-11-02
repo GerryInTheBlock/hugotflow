@@ -175,6 +175,7 @@ export function DataTable<T>({
   expanded,
   onRowPress,
   variant = "default",
+  maxHeight,
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -184,9 +185,12 @@ export function DataTable<T>({
   onRowPress?: (row: T) => void;
   /** "log": the Attendance entry log style (9 px grey caps header, 11 px white cells, taller rows). */
   variant?: "default" | "log";
+  /** Rows scroll inside the table past this height (about 10 rows); the header stays in place. null = no limit. */
+  maxHeight?: number | null;
 }) {
   const minWidth = columns.reduce((w, c) => w + c.width + 8, 24);
   const log = variant === "log";
+  const bodyMax = maxHeight === undefined ? 460 : maxHeight;
   return (
     <View className="overflow-hidden rounded-field border border-line bg-card">
       <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }} showsHorizontalScrollIndicator={false}>
@@ -201,6 +205,7 @@ export function DataTable<T>({
           {rows.length === 0 ? (
             <Text className="border-t border-divider px-3 py-4 font-medium text-[11px] text-ink-3">{empty ?? "Nothing here yet."}</Text>
           ) : null}
+          <ScrollView style={bodyMax ? { maxHeight: bodyMax } : undefined} nestedScrollEnabled showsVerticalScrollIndicator>
           {rows.map((row) => {
             const extra = expanded?.(row);
             const cells = (
@@ -219,6 +224,7 @@ export function DataTable<T>({
               </View>
             );
           })}
+          </ScrollView>
         </View>
       </ScrollView>
     </View>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import {
   Chips,
   Columns,
@@ -310,12 +310,14 @@ function AccountsSummary({ accounts, onOpen }: { accounts: Account[] | null; onO
         <SmallBadge label={`Members ${count("member")}`} />
       </View>
       {accounts === null ? <Empty>Loading…</Empty> : null}
-      {list.map((a) => (
-        <Pressable key={a.user_id} onPress={() => onOpen(a.user_id)} className="flex-row items-center justify-between rounded-field border border-divider bg-card px-3 py-2">
-          <Text className="font-bold text-xs text-ink">{a.full_name}</Text>
-          <SmallBadge label={roleName[a.role]} tone={roleTone[a.role]} />
-        </Pressable>
-      ))}
+      <ScrollView style={{ maxHeight: 300 }} contentContainerClassName="gap-[10px]" nestedScrollEnabled showsVerticalScrollIndicator>
+        {list.map((a) => (
+          <Pressable key={a.user_id} onPress={() => onOpen(a.user_id)} className="flex-row items-center justify-between rounded-field border border-divider bg-card px-3 py-2">
+            <Text className="font-bold text-xs text-ink">{a.full_name}</Text>
+            <SmallBadge label={roleName[a.role]} tone={roleTone[a.role]} />
+          </Pressable>
+        ))}
+      </ScrollView>
       {accounts && list.length <= 1 ? (
         <Text className="font-medium text-[11px] text-ink-2">No staff or instructors yet. Open User accounts and search for their account to give them a role.</Text>
       ) : null}

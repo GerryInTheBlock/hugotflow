@@ -218,6 +218,7 @@ export default function EnginePage() {
                   ]}
                 />
                 {shown.length === 0 ? <Empty>No alerts here.</Empty> : null}
+                <ScrollView style={{ maxHeight: 420 }} contentContainerClassName="gap-[10px]" nestedScrollEnabled showsVerticalScrollIndicator>
                 {shown.map((a) => (
                   <View key={a.alert_id} className="gap-1 rounded-field border border-divider bg-card px-3 py-[10px]">
                     <View className="flex-row items-center justify-between">
@@ -232,6 +233,7 @@ export default function EnginePage() {
                     {a.resolution_note ? <Text className="font-medium text-[10px] text-ink-2">Note: {a.resolution_note}</Text> : null}
                   </View>
                 ))}
+                </ScrollView>
               </>
             ) : (
               <Note>High-risk alerts contain member health data (RA 10173), so only the owner and the instructors see them.</Note>
