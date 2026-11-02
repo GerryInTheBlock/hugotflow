@@ -1,9 +1,9 @@
 /**
  * Instructor review of one member's health profile (Fig 6). Read-only health details, today's daily status,
  * guardian consent documents (members under 18 with a limitation) with Approve / Ask to resubmit,
- * and "Mark as reviewed". The routine view arrives with recommendations in Iteration 4.
+ * "Mark as reviewed", and View Routine (the plan editor).
  */
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, Text, TextInput, View } from "react-native";
 import { InfoNote } from "@/components/health";
@@ -216,7 +216,7 @@ export default function MemberHealthReview() {
           onPress={() => run("review", () => supabase.rpc("mark_profile_reviewed", { p_user_id: id }))}
         />
       ) : null}
-      <Button label="View Routine (with recommendations)" variant="secondary" disabled />
+      <Button label="View Routine" variant="secondary" onPress={() => router.push(`/(instructor)/plan/${id}` as never)} />
     </SubScreen>
   );
 }
