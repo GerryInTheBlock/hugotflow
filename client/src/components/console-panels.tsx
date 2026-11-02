@@ -123,11 +123,11 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
   return (
     <View
       style={{ gap: 20, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
-      className="grow rounded-field border border-divider bg-white/[0.04] p-[15px]"
+      className="rounded-field border border-divider bg-white/[0.04] p-[15px]"
     >
       <PanelHeader icon="checked-user" title="Live attendance" subtitle="Today's check-ins" />
-      {/* Fills the panel and scrolls inside it, so a busy day doesn't stretch the page (flexBasis 0: rows don't size the panel). */}
-      <ScrollView style={{ flexGrow: 1, flexBasis: 0, minHeight: 320 }} contentContainerClassName="gap-[10px] pr-[10px]" showsVerticalScrollIndicator>
+      {/* Same on Dashboard, Attendance and Members: about 6 rows show, the rest scroll inside the panel. */}
+      <ScrollView style={{ maxHeight: 6 * 69 }} contentContainerClassName="gap-[10px] pr-[10px]" showsVerticalScrollIndicator>
         {visits === null ? <Empty>Loading…</Empty> : visits.length === 0 ? <Empty>No check-ins yet today.</Empty> : null}
         {visits?.map((v) => (
           <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-white/[0.06] px-5">
