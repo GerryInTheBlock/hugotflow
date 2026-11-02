@@ -61,6 +61,12 @@ export default function SignUp() {
             Members must be at least 16 years old. Members under 18 with a health limitation need parent or guardian consent.
           </Text>
         </View>
+        <View className="rounded-field bg-white/5 p-3">
+          <Text className="font-medium text-[11px] text-ink-2">
+            Instructors and front-desk staff sign up here too. Every new account starts as a member; the owner then sets your
+            role in Settings → User accounts, and your next login opens your own screens.
+          </Text>
+        </View>
         <Pressable onPress={() => setAgreed((a) => !a)} className="flex-row items-center gap-3">
           <View className={`h-5 w-5 rounded-chip ${agreed ? "bg-brand" : "border border-ink-3"}`} />
           <Text className="flex-1 font-medium text-[11px] text-ink-2">
@@ -71,7 +77,7 @@ export default function SignUp() {
         <Button label="Create account" onPress={submit} loading={busy} />
       </Card>
       <View className="flex-row justify-center gap-1">
-        <Text className="font-medium text-sm text-ink">Already a member?</Text>
+        <Text className="font-medium text-sm text-ink">Already have an account?</Text>
         <Pressable onPress={() => router.push("/(auth)/login")}>
           <Text className="font-bold text-sm text-logo-red">Log in</Text>
         </Pressable>
