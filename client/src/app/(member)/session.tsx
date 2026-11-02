@@ -5,12 +5,26 @@
  */
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SubScreen } from "@/components/SubScreen";
 import { GradientButton, OutlineButton, shadow } from "@/components/workout";
 import { useAuth } from "@/lib/auth";
-import { activePlan, clock, completeSet, dose, finishWorkout, setTiming, startWorkout, type Plan, type Session } from "@/lib/workout";
+import { useMyHealth } from "@/lib/health";
+import {
+  activePlan,
+  clock,
+  completeSet,
+  deferExercise,
+  dose,
+  finishWorkout,
+  safeAlternatives,
+  setTiming,
+  startWorkout,
+  swapExercise,
+  type Plan,
+  type Session,
+} from "@/lib/workout";
 import { brandGlow, brandGradient, colors } from "@/theme";
 
 export default function WorkoutSession() {
@@ -21,6 +35,10 @@ export default function WorkoutSession() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
+  const health = useMyHealth(profile?.user_id);
+  // "Machine busy?" panel (Fig 13b swap; migration 0014 "Do it later")
+  const [busyOpen, setBusyOpen] = useState(false);
+  const [alts, setAlts] = useState<{ code: string; name: string; equipment: string }[] | null>(null);
 
   // One tick per second drives the set and rest countdowns.
   useEffect(() => {
@@ -95,6 +113,21 @@ export default function WorkoutSession() {
       setBusy(false);
     }
   };
+  // Swap or move, then reload today's plan (the session keeps its progress).
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setNotice(null);
+    try {
+      await fn();
+      setPlan(await activePlan(profile!.user_id));
+      setBusyOpen(false);
+    } catch (e) {
+      setNotice((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const finish = async () => {
     setBusy(true);
     try {
@@ -192,6 +225,58 @@ export default function WorkoutSession() {
             busy={busy}
             disabled={!ready}
           />
+          <OutlineButton
+            label={busyOpen ? "Close" : "Machine busy?"}
+            onPress={async () => {
+              const open = !busyOpen;
+              setBusyOpen(open);
+              setAlts(null);
+              setNotice(null);
+              if (open) setAlts(await safeAlternatives(item.code, health.profile?.joint_conditions ?? []).catch(() => []));
+            }}
+          />
+          {busyOpen ? (
+            <View style={shadow} className="gap-[10px] rounded-card border border-line bg-card p-5">
+              <Text className="font-bold text-base text-ink">{item.equipment} is taken?</Text>
+              <Text className="font-medium text-sm text-ink-2">Swap to a safe alternative, or do this exercise at the end.</Text>
+              {alts === null ? (
+                <ActivityIndicator color={colors["brand-light"]} />
+              ) : alts.length === 0 ? (
+                <Text className="font-medium text-xs text-ink-2">No safe alternative is free right now.</Text>
+              ) : (
+                alts.map((a) => (
+                  <Pressable
+                    key={a.code}
+                    disabled={busy}
+                    onPress={() =>
+                      act(async () => {
+                        await swapExercise(plan.recommendation_id, where.index, a.code);
+                      })
+                    }
+                    className="flex-row items-center justify-between rounded-field bg-field p-3"
+                  >
+                    <Text className="font-bold text-sm text-ink">Swap to {a.name}</Text>
+                    <Text className="font-medium text-xs text-ink-2">{a.equipment}</Text>
+                  </Pressable>
+                ))
+              )}
+              {where.set === 0 && where.index < plan.routine.length - 1 ? (
+                <OutlineButton
+                  label="Do it later (move to the end)"
+                  disabled={busy}
+                  onPress={() =>
+                    act(async () => {
+                      await deferExercise(plan.recommendation_id, where.index);
+                    })
+                  }
+                />
+              ) : (
+                <Text className="font-medium text-[11px] text-ink-3">
+                  {where.set > 0 ? "You already started this exercise, so it can only be swapped." : "This is the last exercise."}
+                </Text>
+              )}
+            </View>
+          ) : null}
           <OutlineButton label="Pause workout" onPress={() => router.replace("/(member)/workout")} />
         </View>
       </View>

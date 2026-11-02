@@ -65,10 +65,10 @@ def model():
 
 
 def run(model, *, conditions=(), severity="none", goal="strength", experience="beginner", daily=None, birthdate="2000-01-01",
-        consent=True, out_of_order=()):
+        consent=True, out_of_order=(), user_id="member-1"):
     profile = {"bmi": 24.5, "fitness_goal": goal, "experience_level": experience, "joint_conditions": list(conditions),
                "severity": severity, "consent_verified": consent}
-    return engine.recommend(model, profile=profile, user={"birthdate": birthdate}, daily=daily,
+    return engine.recommend(model, profile=profile, user={"user_id": user_id, "birthdate": birthdate}, daily=daily,
                             equipment_rows=equipment_rows(out_of_order), exercise_rows=exercise_rows(), today=date(2026, 11, 2))
 
 
@@ -76,7 +76,7 @@ def test_knee_gets_modified_plan_and_skips_back_squat(model):
     r = run(model, conditions=["knee"], severity="moderate")
     assert r.program == "Strength-Modified-Lower"
     names = [i["name"] for i in r.routine]
-    assert "Barbell back squat" not in names and "Goblet Squat" in names
+    assert "Barbell back squat" not in names and ("Goblet Squat" in names or "Leg press" in names)
     assert any(s["name"] == "Barbell back squat" and s["reason"] == "Knee constraint" for s in r.skipped)
     assert not r.alert
 
@@ -156,3 +156,11 @@ def test_endpoint_auth_and_save(model, monkeypatch):
     assert body["recommendation_id"] == "rec-1" and body["program"] == "Strength-Modified-Lower"
     assert fake.saved["p_user_id"] == "me" and fake.saved["p_class"] == body["program"]
     main.app.dependency_overrides.clear()
+
+
+def test_equal_choices_spread_across_members_but_stay_fixed_for_one(model):
+    squats = {next(i["name"] for i in run(model, conditions=["knee"], severity="moderate", user_id=f"m{k}").routine if i["pattern"] == "squat") for k in range(20)}
+    assert squats == {"Goblet Squat", "Leg press"}  # both equally safe options get used
+    a = run(model, conditions=["knee"], severity="moderate", user_id="m7").routine
+    b = run(model, conditions=["knee"], severity="moderate", user_id="m7").routine
+    assert a == b  # the same member gets the same plan all day

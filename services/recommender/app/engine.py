@@ -10,6 +10,7 @@ Order of work, following the paper and Build Plan §3 #4:
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import date
@@ -92,7 +93,7 @@ def dosage(experience: str, modified: bool, daily: str) -> tuple[int, str, str]:
 
 
 def build_routine(program: str, *, exercises: dict[str, dict], equipment: dict[int, dict], conditions: list[str],
-                  severity: str, experience: str, daily: str, goal: str) -> tuple[list[dict], list[dict]]:
+                  severity: str, experience: str, daily: str, goal: str, seed: str = "") -> tuple[list[dict], list[dict]]:
     spec = PROGRAMS[program]
     sets, reps, intensity = dosage(experience, spec["modified"], daily)
     routine: list[dict] = []
@@ -127,6 +128,13 @@ def build_routine(program: str, *, exercises: dict[str, dict], equipment: dict[i
                 skipped.append({"code": code, "name": exercises[code]["name"], "reason": reason})
         if not chosen:
             continue
+        # Spread members across the floor: when the slot's own list has two or more safe, free choices, the first
+        # choice alternates per member and day (seed), so people with the same program don't all queue for one machine.
+        if seed:
+            safe = [c for c in slot if c in exercises and c not in used and why_not(exercises[c]) is None][:2]
+            if len(safe) == 2:
+                pick = int(hashlib.md5(f"{seed}:{len(routine)}".encode()).hexdigest(), 16) % 2
+                chosen = exercises[safe[pick]]
         used.add(chosen["code"])
         eq = equipment[chosen["equipment_id"]]
         item = {
@@ -183,6 +191,7 @@ def recommend(model, *, profile: dict, user: dict, daily: dict | None, equipment
         program, exercises=exercises, equipment=equipment, conditions=conds,
         severity=profile.get("severity") or "none", experience=row["experience"],
         daily=(daily or {}).get("status") or "good", goal=row["goal"],
+        seed=f"{user.get('user_id', '')}:{today.isoformat()}",
     )
     usable = [e for e in equipment_rows if e.get("maintenance_status") != "out_of_order"]
     return Result(

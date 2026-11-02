@@ -153,3 +153,20 @@ select 'R14a no note' as t, resolve_alert((select alert_id from high_risk_alerts
 select 'R14b resolve' as t, resolve_alert((select alert_id from high_risk_alerts where member_id = '00000000-0000-0000-0000-0000000000b1'), 'Plan adjusted, cleared to train with modifications');
 reset role;
 select 'R14c status' as t, status from high_risk_alerts where member_id = '00000000-0000-0000-0000-0000000000b1';
+
+-- R17 "Machine busy? Do it later" (migration 0014)
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+-- R17a move the 2nd exercise (Seated chest press) to the end → order ends with Seated chest press
+select 'R17a moved' as t, defer_exercise((select recommendation_id from workout_recommendations where status = 'active'), 1)->>'name';
+select 'R17b order' as t, string_agg(x->>'name', ' > ' order by i)
+  from workout_recommendations r, jsonb_array_elements(r.routine) with ordinality as t(x, i) where r.status = 'active';
+-- R17c the last exercise cannot move → ERROR "This is already the last exercise"
+select 'R17c last' as t, defer_exercise((select recommendation_id from workout_recommendations where status = 'active'), 3);
+-- R17d after starting an exercise it cannot move → ERROR "You can only move an exercise before starting it"
+select 'R17d start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_done;
+reset role;
+update workout_sessions set started_at = now() - interval '1 minute' where status = 'in_progress';
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R17e one set' as t, (complete_set((select session_id from workout_sessions where status = 'in_progress'))).sets_done;
+select 'R17f move started' as t, defer_exercise((select recommendation_id from workout_recommendations where status = 'active'), 0);
+reset role;
