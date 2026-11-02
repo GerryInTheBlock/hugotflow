@@ -94,7 +94,9 @@ export default function WorkoutSession() {
     );
   }
 
-  const finished = session.status === "finished" || session.sets_done >= session.sets_total;
+  // Count sets from the plan on screen: an instructor may change the plan during the workout (migration 0016).
+  const totalSets = plan.routine.reduce((t, i) => t + Math.max(1, i.sets ?? 1), 0);
+  const finished = session.status === "finished" || session.sets_done >= totalSets;
   const item = plan.routine[where.index];
 
   // Set and rest timers (enforced again by complete_set in migration 0012).
@@ -150,7 +152,7 @@ export default function WorkoutSession() {
   // Figma "Finish Workout" (38:1006): how the body feels after the session, for the member's next plan and the instructor.
   if (finished) {
     return (
-      <SubScreen kicker={`Workout complete · ${session.sets_total} sets across ${plan.routine.length} exercises`} title="How is your body now?" backTo="/(member)/workout">
+      <SubScreen kicker={`Workout complete · ${Math.min(session.sets_done, totalSets)} sets across ${plan.routine.length} exercises`} title="How is your body now?" backTo="/(member)/workout">
         <View className="gap-[15px]">
           {(
             [

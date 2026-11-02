@@ -183,3 +183,18 @@ select 'R18d alert' as t, status, constraint_summary from high_risk_alerts
  where member_id = '00000000-0000-0000-0000-0000000000b1' and constraint_summary like 'Pain after workout%';
 select 'R18e coach told' as t, count(*) from notifications
  where user_id = '00000000-0000-0000-0000-00000000000c' and body like '%Pain after workout%';
+
+-- R19 an instructor shortens the plan while Tina is mid-workout (migration 0016): the open workout follows the plan
+--     → total 3 after the edit; once 3 sets are done, Complete set returns 3 of 3 (no "Set 4 of 3")
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R19a start' as t, (start_workout((select recommendation_id from workout_recommendations where status = 'active'))).sets_total;
+reset role;
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000c';
+select 'R19b shorten' as t, save_instructor_plan((select recommendation_id from workout_recommendations where user_id = '00000000-0000-0000-0000-0000000000b1' and status = 'active'),
+  '[{"code":"goblet_squat","name":"Goblet Squat","equipment":"Kettlebells","sets":3,"reps":"10","rest_s":60}]', 'Short session today');
+reset role;
+select 'R19c totals' as t, sets_done, sets_total from workout_sessions where status = 'in_progress';
+update workout_sessions set sets_done = 3 where status = 'in_progress';
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-0000000000b1';
+select 'R19d complete' as t, s.sets_done, s.sets_total from complete_set((select session_id from workout_sessions where status = 'in_progress')) s;
+reset role;
