@@ -24,6 +24,14 @@ export default function MemberHome() {
   useFocusEffect(
     useCallback(() => {
       if (!profile) return;
+      // New members fill in their Health Profile first (Scope: Health Profile module).
+      supabase
+        .from("health_profiles")
+        .select("profile_id", { count: "exact", head: true })
+        .eq("user_id", profile.user_id)
+        .then(({ count, error }) => {
+          if (!error && count === 0) router.replace("/(member)/onboarding" as never);
+        });
       supabase
         .from("subscribers")
         .select("subscription_type, expiration_date, status")
