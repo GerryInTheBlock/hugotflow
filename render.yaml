@@ -1,6 +1,8 @@
-# Render Blueprint for the recommendation service (free web service; sleeps after 15 min idle).
-# In Render: New > Blueprint > pick the GitHub repo. Then set the two secret values in the service's Environment tab.
+# Render Blueprint (free plan only): the C4.5 recommendation service and the web console for the gym laptop.
+# In Render: New > Blueprint > pick the GitHub repo. Render asks for the values marked "sync: false" once.
+# See docs/deployment.md.
 services:
+  # C4.5 recommendation engine (FastAPI). Free web service: sleeps after 15 min idle, wakes in about 30–60 s.
   - type: web
     name: hugotflow-recommender
     runtime: python
@@ -14,7 +16,41 @@ services:
         value: "3.12.7"
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
+      - key: SUPABASE_SERVICE_ROLE_KEY   # secret key: only here, never in the repo or the app
         sync: false
-      - key: ALLOWED_ORIGINS
+      - key: ALLOWED_ORIGINS             # the web console may call the engine
+        fromService:
+          type: web
+          name: hugotflow-web
+          property: host
+
+  # Web console + member web app (Expo web export). Free static site.
+  - type: web
+    name: hugotflow-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm ci && npx expo export -p web
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: EXPO_PUBLIC_SUPABASE_URL
         sync: false
+      - key: EXPO_PUBLIC_SUPABASE_ANON_KEY   # the publishable key only
+        sync: false
+      - key: EXPO_PUBLIC_RECOMMENDER_URL
+        fromService:
+          type: web
+          name: hugotflow-recommender
+          property: host
+    headers:
+      # The offline service worker must always be fresh, or the laptop keeps an old version.
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+    routes:
+      # Single-page app: every path (e.g. /payments) loads index.html.
+      - type: rewrite
+        source: /*
+        destination: /index.html

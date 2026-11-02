@@ -37,6 +37,25 @@ function registerOfflineApp() {
 }
 registerOfflineApp();
 
+/**
+ * Dark, thin scrollbars that match the console theme (web only; phones draw their own).
+ * Added at startup because NativeWind's CSS build drops plain scrollbar rules from global.css.
+ */
+function themeScrollbars() {
+  if (Platform.OS !== "web" || typeof document === "undefined" || document.getElementById("hf-scrollbars")) return;
+  const style = document.createElement("style");
+  style.id = "hf-scrollbars";
+  style.textContent = `
+    * { scrollbar-width: thin; scrollbar-color: ${colors["line-strong"]} transparent; }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track, *::-webkit-scrollbar-corner { background: transparent; }
+    *::-webkit-scrollbar-button { display: none; }
+    *::-webkit-scrollbar-thumb { background: ${colors["line-strong"]}; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+    *::-webkit-scrollbar-thumb:hover { background: ${colors.brand}; background-clip: padding-box; }`;
+  document.head.appendChild(style);
+}
+themeScrollbars();
+
 /** Saves files loaded before the worker took over (app bundle, fonts), so one visit is enough to work offline. */
 function saveLoadedFiles() {
   if (Platform.OS !== "web" || __DEV__ || typeof window === "undefined" || !("serviceWorker" in navigator)) return;

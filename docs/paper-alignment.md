@@ -204,3 +204,19 @@ New section on page "Dark theme · Hugot Gym": **Built app · Iteration 4 update
 | Instructor · member health review | Health profile, daily status, recent workouts with how each felt | Instructor review of health profiles |
 | Login | One sign-in for everyone, email only | Users of the system (owner, staff, instructors, members) |
 | Equipment (web) | 10 per page, staff notes visible to the reporter | Equipment maintenance module |
+
+## Iteration 5: Reports (Scope "Reports", Fig 9, Fig 14)
+| Paper requirement | Where in the app | Status |
+|---|---|---|
+| Owner dashboard: today's check-ins, Day Pass revenue, monthly revenue, equipment pending (Fig 14) | Console > Dashboard stat cards (`dashboard_summary`) | Built, tested (RP13) |
+| Hourly crowd density, peak hours | Dashboard area chart (`crowd_by_hour`, average of the last 30 days) | Built, tested (RP12) |
+| Walk-in vs subscription revenue | Dashboard bar chart (`revenue_by_month`) | Built, tested (RP13) |
+| Alerts and live check-ins | Dashboard Notifications + Live attendance panels | Built (reused from Iteration 2) |
+| Printable attendance report with filters | Console > Reports > Attendance (`report_attendance`) | Built, tested (RP4–RP7) |
+| Printable payment records | Reports > Payment records (`report_payments`); only owner-confirmed payments count as revenue, refunds are negative | Built, tested (RP8–RP9) |
+| Printable membership status | Reports > Membership status (`report_membership`) | Built, tested (RP10–RP11) |
+| Print / PDF / CSV, traceable | Export panel; every export logged in `report_exports` and `audit_log` | Built, tested (RP14–RP16) |
+| Staff do not see revenue analytics (Fig 5) | Nav hides Dashboard/Reports for staff; functions refuse non-owners | Tested (RP1–RP3, RP15) |
+
+ERD change for Figure 20: new table `report_exports` (export_id, report, period, format, created_by, created_at).
+Figma difference: filters are chips instead of dropdowns; the crowd chart shows a 30-day average.

@@ -95,7 +95,9 @@ export async function activePlan(userId: string): Promise<Plan | null> {
   return (data as Plan | null) ?? null;
 }
 
-const ENGINE = (process.env.EXPO_PUBLIC_RECOMMENDER_URL ?? "").replace(/\/$/, "");
+// Render passes the engine's host name only, so add https:// when it is missing.
+const ENGINE_RAW = (process.env.EXPO_PUBLIC_RECOMMENDER_URL ?? "").trim().replace(/\/$/, "");
+const ENGINE = ENGINE_RAW && !ENGINE_RAW.includes("://") ? `https://${ENGINE_RAW}` : ENGINE_RAW;
 
 export class EngineError extends Error {
   constructor(message: string, public kind: "locked" | "offline" | "error") {
