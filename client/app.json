@@ -8,9 +8,22 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0A0B",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": true, "bundleIdentifier": "ph.hugotgym.hugotflow" },
-    "android": { "package": "ph.hugotgym.hugotflow", "edgeToEdgeEnabled": true },
-    "web": { "bundler": "metro", "output": "single", "name": "HugotFlow" },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ph.hugotgym.hugotflow"
+    },
+    "android": {
+      "package": "ph.hugotgym.hugotflow",
+      "edgeToEdgeEnabled": true,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "HugotFlow"
+    },
     "plugins": [
       "expo-router",
       "expo-font",
@@ -18,10 +31,20 @@
         "expo-image-picker",
         {
           "photosPermission": "HugotFlow uses your photos so you can attach a picture to an equipment report or your guardian consent.",
-          "cameraPermission": "HugotFlow uses the camera so you can take a picture of broken equipment or your guardian consent documents."
+          "cameraPermission": "HugotFlow uses the camera so you can take a picture of broken equipment or your guardian consent documents.",
+          "microphonePermission": false
         }
       ]
     ],
-    "experiments": { "typedRoutes": true }
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c5e47134-cf6b-4367-a36d-5105abe08c48"
+      }
+    },
+    "owner": "gerrytapuyo"
   }
 }
