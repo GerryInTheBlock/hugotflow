@@ -18,11 +18,8 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY   # secret key: only here, never in the repo or the app
         sync: false
-      - key: ALLOWED_ORIGINS             # the web console may call the engine
-        fromService:
-          type: web
-          name: hugotflow-web
-          property: host
+      - key: ALLOWED_ORIGINS             # the web console may call the engine (public URL, not secret)
+        value: https://hugotflow-web.onrender.com
 
   # Web console + member web app (Expo web export). Free static site.
   - type: web
@@ -39,11 +36,8 @@ services:
         sync: false
       - key: EXPO_PUBLIC_SUPABASE_ANON_KEY   # the publishable key only
         sync: false
-      - key: EXPO_PUBLIC_RECOMMENDER_URL
-        fromService:
-          type: web
-          name: hugotflow-recommender
-          property: host
+      - key: EXPO_PUBLIC_RECOMMENDER_URL   # public URL (Render's fromService host is internal-only)
+        value: https://hugotflow-recommender.onrender.com
     headers:
       # The offline service worker must always be fresh, or the laptop keeps an old version.
       - path: /sw.js
