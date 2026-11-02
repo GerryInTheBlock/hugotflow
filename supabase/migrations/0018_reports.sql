@@ -13,7 +13,7 @@ begin
 end $$;
 
 create or replace function public.manila_date(p timestamptz) returns date
-language sql immutable as $$ select (p at time zone 'Asia/Manila')::date $$;
+language sql immutable set search_path = public as $$ select (p at time zone 'Asia/Manila')::date $$;
 
 -- The kind a payment counts as: a refund counts against the kind it refunds.
 create or replace function public.revenue_kind(t public.transactions) returns text
