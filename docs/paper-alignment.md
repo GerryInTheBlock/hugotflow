@@ -153,3 +153,39 @@ Built from frames 38:2125 / 38:2170 (Onboarding), 38:1895 (Guardian consent), 38
 
 Added fields `health_profiles.training_background` (Step 1), `health_profiles.reviewed_by` / `reviewed_at` (instructor review),
 `guardian_consents.status` / `review_note` (Approve / Ask to resubmit).
+
+## Iteration 4: Workout Recommendation (C4.5) and High-Risk Alerts (Nov 2026)
+
+| Paper requirement | Where | Status |
+| --- | --- | --- |
+| C4.5-style tree (scikit-learn, entropy) using health profile, goal and equipment availability (Scope; Ch3 training pipeline) | `ml/train.py` (GridSearchCV, stratified 80/20), `app/features.py` (age, BMI, goal, experience, 6 limitations, severity, daily status, 5 equipment groups) | Built; training waits for Python on this laptop |
+| Dataset from exercise rules and the instructors' programs, not real member data (Limitations) | `ml/generate_dataset.py`, rules R1–R12 in `ml/rules.md` | Built, unit tests in `ml/tests` |
+| Evaluation: accuracy, precision, recall, F1, confusion matrix; Gain Ratio (Formulas 1–4) | `ml/evaluate.py` → `ml/report.md` | Built; numbers after training |
+| 3 goal programs, standard or modified; modified routines leave out exercises that strain the joint (Scope) | 7 classes in `app/programs.json`; `app/engine.py` filters with `exercises.contraindicated` | Built, service tests |
+| Out of Order equipment never recommended; Appendix 2 substitutes used (Scope; Fig 8) | `app/engine.py`, catalogue `ml/catalogue.json` (63 exercises, seeded by 0010) | Built, service test |
+| Severe constraint → modified routine + one-tap instructor link + High-Risk Alert (Scope; Fig 18) | severity gate in `app/engine.py`, `record_recommendation`, "Book an instructor (one tap)" → `request_coaching` | Done in the database (R2, R3, R13); service tests |
+| Instructor reviews and adjusts routines (Fig 7) | Instructor plan editor, `save_instructor_plan` (stored as a correction for retraining) | Done, tested (R9, R10) |
+| Instructor handles alerts; owner reviews alert logs (Fig 7) | Instructor Alerts (Acknowledge / Resolve), Engine page referral queue (owner) | Done, tested (R7, R8, R14) |
+| Member starts or swaps exercises (Scope) | Workout in Progress, Review full plan → Swap exercise (`swap_exercise`) | Done, tested (R11, R12) |
+| Recommendations shown as suggestions (Limitations) | Note on the plan screen and in the API response | Done |
+| Engine monitoring: status, latency, model version, equipment sync, referrals, feature matrix, decision path, equipment filter, referral queue (Fig 17) | Console > Engine | Done (live once the service is deployed) |
+| Health data kept from the front desk (RA 10173) | plans and alerts readable by the member, instructors and owner only | Done, tested (R4, R5) |
+
+### Matched to Figma (Iteration 4)
+
+Built from 38:523, 38:1167, 38:879, 38:976, 38:1006, 38:1123 (member), 38:89, 38:237, 38:927, 38:1206, 38:1237, 38:2243
+(instructor) and 38:3452 (web). Differences on purpose:
+
+- The plan tag shows "Joint-safe" for modified programs and "<experience>-safe" otherwise (the frame always says "Beginner-safe").
+- Equipment lines show the machine (e.g. "Kettlebells"), not a weight ("Kettlebell 12 kg"): loads are the member's choice.
+- "Equipment checked · N available" counts every usable machine in the gym.
+- "How is your body today?" (38:1006) comes before the plan is built, as Fig 18 puts the daily status first.
+- "Your profile is ready" (38:1123) ends onboarding; its step label reads "All set" (the frame says "Step 1 of 3").
+- Instructor alerts have Open / Resolved tabs and expand in place for Acknowledge / Resolve (no separate detail frame).
+- Engine: staff see the service status only; member data and the referral queue are owner-only.
+
+### ERD changes to show in Figure 20 (Iteration 4)
+
+New tables `workout_sessions`, `recommendation_corrections`, `coaching_requests`. New fields: `exercises.code / pattern / cue /
+substitutes`, `workout_recommendations.status / skipped / features / latency_ms / source / instructor_note`,
+`high_risk_alerts.resolution_note`, `gym_settings.coaching_url`.

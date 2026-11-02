@@ -11,6 +11,7 @@ Run the migrations once, in order, in **Supabase > SQL Editor > New query** (pas
 7. `migrations/0007_hardening.sql`: closes the job and trigger functions to the API (Supabase security advisor)
 8. `migrations/0008_attendance.sql`: check-in (`check_in`), non-match records, and the offline data for the front-desk laptop (`terminal_snapshot`)
 9. `migrations/0009_health_equipment.sql`: health profile saving, guardian consent (checked by the instructor), daily status, equipment report review
+10. `migrations/0010_recommendations.sql`: exercise catalogue (63 exercises from `ml/catalogue.json`), saved plans, High-Risk Alerts, instructor plan edits, workout progress, one-tap coaching requests
 
 Before step 4, turn on **pg_cron** in **Database > Extensions** so the jobs get scheduled:
 - 12-hour Day Pass expiry, every 5 minutes
@@ -57,7 +58,7 @@ Health data is written only through `save_health_profile`, `submit_guardian_cons
 
 Tested with `tests/rls_test.sql` (Iteration 0, PostgreSQL 16), `tests/payments_test.sql`
 (Iteration 1) `tests/attendance_test.sql` (Iteration 2) and `tests/health_equipment_test.sql` (Iteration 3), on PGlite / PostgreSQL 17.
-Run the stub, the nine migrations, then the four test files.
+Run the stub, the ten migrations, then the five test files (`tests/recommendation_test.sql` covers Iteration 4).
 
 ## How the entry QR codes work
 
