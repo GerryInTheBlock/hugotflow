@@ -7,6 +7,7 @@ import { colors } from "@/theme";
 
 const sources = {
   "add-circle": require("../../assets/icons/add-circle.png"),
+  adjust: require("../../assets/icons/adjust.png"),
   "arrow-right": require("../../assets/icons/arrow-right.png"),
   back: require("../../assets/icons/back.png"),
   camera: require("../../assets/icons/camera.png"),
