@@ -10,6 +10,7 @@ Run the migrations once, in order, in **Supabase > SQL Editor > New query** (pas
 6. `migrations/0006_day_pass_requests.sql`: Day Pass requests from the app ("Confirm paid"), receipt numbers `HF-R-2026-0412`, receipts for members
 7. `migrations/0007_hardening.sql`: closes the job and trigger functions to the API (Supabase security advisor)
 8. `migrations/0008_attendance.sql`: check-in (`check_in`), non-match records, and the offline data for the front-desk laptop (`terminal_snapshot`)
+9. `migrations/0009_health_equipment.sql`: health profile saving, guardian consent (checked by the instructor), daily status, equipment report review
 
 Before step 4, turn on **pg_cron** in **Database > Extensions** so the jobs get scheduled:
 - 12-hour Day Pass expiry, every 5 minutes
@@ -40,7 +41,8 @@ After that, the owner manages roles from **Settings > User accounts** in the web
 | --- | --- | --- | --- | --- |
 | Own account, own payments, own attendance | yes | yes | yes | yes |
 | Other members' accounts | no | read | read/edit | read/edit |
-| Health profiles (sensitive, RA 10173) | own only | read/edit | **no** | read/edit |
+| Health profiles (sensitive, RA 10173) | own only (writes through functions) | read, mark reviewed | **no** | read, mark reviewed |
+| Guardian consent + medical certificate | own only | read, approve | **no** | read, approve |
 | Payments | own only | no | read (writes go through functions) | read, confirm |
 | Equipment | read, report | read | verify, set Out of Order | everything |
 | High-risk alerts | no | read/update | no | read/update |
@@ -48,10 +50,14 @@ After that, the owner manages roles from **Settings > User accounts** in the web
 
 Payments are never written to directly: the app calls `record_payment` and `confirm_day_pass_payment` (staff/owner),
 `request_day_pass` and `cancel_day_pass_request` (members), `get_receipt`, `review_payment`
-and `refund_payment` (owner only). Check-ins go through `check_in`, `record_non_match` and `terminal_snapshot` (staff/owner). Prices are read from `plans` and `gym_settings` inside the database.
+and `refund_payment` (owner only). Check-ins go through `check_in`, `record_non_match` and `terminal_snapshot` (staff/owner).
+Health data is written only through `save_health_profile`, `submit_guardian_consent` and `save_daily_status` (the member),
+`verify_guardian_consent` and `mark_profile_reviewed` (instructor or owner). Equipment reports are reviewed with
+`review_equipment_report` and `restore_equipment` (staff or owner). Prices are read from `plans` and `gym_settings` inside the database.
 
 Tested with `tests/rls_test.sql` (Iteration 0, PostgreSQL 16), `tests/payments_test.sql`
-(Iteration 1) and `tests/attendance_test.sql` (Iteration 2), on PGlite / PostgreSQL 17. Run the stub, the eight migrations, then the three test files.
+(Iteration 1) `tests/attendance_test.sql` (Iteration 2) and `tests/health_equipment_test.sql` (Iteration 3), on PGlite / PostgreSQL 17.
+Run the stub, the nine migrations, then the four test files.
 
 ## How the entry QR codes work
 

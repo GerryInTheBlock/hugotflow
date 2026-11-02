@@ -108,6 +108,11 @@ select 'H14c changed', (save_daily_status('good')).status;
 select 'H14d rows today', count(*), max(status::text) from daily_status where user_id = '00000000-0000-0000-0000-00000000000e';
 reset role;
 
+-- H15 another member cannot look up Tina's consent state (it reveals a minor with a condition) → null
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000e';
+select 'H15 other member' as t, consent_state('00000000-0000-0000-0000-0000000000b1') is null as hidden;
+reset role;
+
 -- ================================================================ Equipment Management
 
 -- E1 a member cannot file a report that is already resolved → ERROR permission denied

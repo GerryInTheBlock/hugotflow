@@ -44,9 +44,10 @@ grant insert (equipment_id, reported_by, issue_type, safety_risk, description, p
 
 -- ---------------------------------------------------------------- helpers
 create or replace function public.age_on(p_birthdate date, p_day date) returns int
-language sql immutable as $$ select extract(year from age(p_day, p_birthdate))::int $$;
+language sql immutable set search_path = public as $$ select extract(year from age(p_day, p_birthdate))::int $$;
 
 -- 'not_needed' | 'needed' | 'pending' | 'resubmit' | 'verified'
+-- Only for the member themself, instructors and the owner (it reveals a minor with a health condition).
 create or replace function public.consent_state(p_user uuid) returns text
 language sql stable security definer set search_path = public as $$
   select case
@@ -61,6 +62,7 @@ language sql stable security definer set search_path = public as $$
   end
   from public.health_profiles hp join public.users u using (user_id)
   where hp.user_id = p_user
+    and (p_user = auth.uid() or public.is_instructor_or_admin())
 $$;
 revoke execute on function public.consent_state(uuid) from public, anon;
 grant execute on function public.consent_state(uuid) to authenticated;
