@@ -87,7 +87,7 @@ export function MyAttendance({ variant = "member" }: { variant?: "member" | "ins
 
         <View className="gap-[25px]">
           <View
-            style={{ shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 } }}
+            style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 } }}
             className="gap-[15px] rounded-card border border-line bg-card p-5"
           >
             <Text className="font-bold text-2xl text-ink">Ready when you are</Text>
@@ -116,7 +116,7 @@ export function MyAttendance({ variant = "member" }: { variant?: "member" | "ins
           </View>
 
           <View
-            style={{ shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 0 } }}
+            style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 10, shadowOffset: { width: 0, height: 0 } }}
             className="gap-[10px] rounded-field border border-line bg-card px-5 pb-[15px] pt-[10px]"
           >
             <Text className="font-bold text-sm text-ink">This month</Text>

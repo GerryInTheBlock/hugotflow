@@ -7,7 +7,7 @@ import { Badge, Button, Card, Logo, Screen, Title } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 import { manilaToday, shortDate } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
-import { brandGlow, brandGradient } from "@/theme";
+import { brandGlow, brandGradient, colors } from "@/theme";
 
 type Membership = { subscription_type: string; expiration_date: string; status: string } | null;
 
@@ -85,19 +85,29 @@ export default function MemberHome() {
       </View>
       <Title kicker={`Good day, ${firstName}`}>Ready to Move today?</Title>
       <Pressable onPress={() => router.push("/(member)/membership")}>
-        <Card>
+        {/* Red hero card (Figma "Light theme" Home): white text, white "Show my entry QR" button with red label */}
+        <View className="gap-3 rounded-card bg-brand p-5">
           <View className="flex-row items-center justify-between">
-            <Text className="font-medium text-sm text-ink-2">MEMBERSHIP</Text>
-            <Badge label={active ? "Active" : membership ? "Expired" : "No plan"} tone={active ? "ok" : "neutral"} />
+            <Text className="font-medium text-sm text-on-brand/85">MEMBERSHIP</Text>
+            <View className="rounded-full bg-white/20 px-3 py-1">
+              <Text className="font-semibold text-xs text-on-brand">{active ? "Active" : membership ? "Expired" : "No plan"}</Text>
+            </View>
           </View>
-          <Text className="font-bold text-[32px] text-ink">{membership?.subscription_type ?? "Walk-in"}</Text>
-          <Text className="font-medium text-sm text-ink-2">
+          <Text className="font-bold text-[32px] text-on-brand">{membership?.subscription_type ?? "Walk-in"}</Text>
+          <Text className="font-medium text-sm text-on-brand/85">
             {membership
               ? `${active ? "Active until" : "Ended"} ${shortDate(membership.expiration_date)}`
               : "Ask the front desk about Half-month and Monthly plans, or request a Day Pass below."}
           </Text>
-          <Button label="Show my entry QR" onPress={() => router.push("/(member)/entry-pass")} />
-        </Card>
+          <Pressable
+            onPress={() => router.push("/(member)/entry-pass")}
+            accessibilityRole="button"
+            className="mt-1 flex-row items-center justify-center gap-[10px] rounded-[20px] bg-white py-[15px]"
+          >
+            <Icon name="qr-code" size={22} color={colors.brand} />
+            <Text className="font-bold text-sm text-brand">Show my entry QR</Text>
+          </Pressable>
+        </View>
       </Pressable>
 
       <View className="gap-[10px]">
@@ -130,7 +140,7 @@ function QuickAction({ icon, label, onPress }: { icon: IconName; label: string; 
         <Text className="font-bold text-sm text-ink">{label}</Text>
       </View>
       <View
-        style={{ shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 12.5, shadowOffset: { width: 0, height: 0 } }}
+        style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 12.5, shadowOffset: { width: 0, height: 0 } }}
         className="h-[30px] w-[30px] items-center justify-center rounded-full border border-line bg-card"
       >
         <Icon name="arrow-right" size={25} />

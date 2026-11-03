@@ -9,6 +9,7 @@ import { AreaChart, BarChart, Legend } from "@/components/charts";
 import { Columns, Empty, Note, Page, PanelHeader } from "@/components/console";
 import { LiveAttendance, NotificationsPanel } from "@/components/console-panels";
 import { Icon } from "@/components/Icon";
+import { colors } from "@/theme";
 import { peso } from "@/lib/format";
 import { crowdByHour, dashboardSummary, monthShort, peakWindow, revenueByMonth, type DashboardSummary, type HourPoint, type MonthRevenue } from "@/lib/reports";
 
@@ -34,10 +35,10 @@ function StatCard({ label, value, sub, subColor, accent, to }: { label: string; 
         gap: 6,
         borderRadius: 15,
         borderWidth: 1,
-        borderColor: hover ? "#E3061B" : "#E4E4E7",
-        backgroundColor: hover ? "#FFF5F5" : "#FFFFFF",
+        borderColor: hover ? colors.brand : colors.line,
+        backgroundColor: hover ? colors.plum : colors.card,
         shadowColor: "#000",
-        shadowOpacity: 0.35,
+        shadowOpacity: 0,
         shadowRadius: 18,
         shadowOffset: { width: 0, height: 6 },
         overflow: "hidden",
@@ -48,7 +49,7 @@ function StatCard({ label, value, sub, subColor, accent, to }: { label: string; 
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <Text className="font-semibold text-[13px] text-ink-2">{label}</Text>
         <View
-          style={{ width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", backgroundColor: hover ? "#E3061B" : "rgba(255,255,255,0.08)" }}
+          style={{ width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", backgroundColor: hover ? colors.brand : colors.ink }}
         >
           <Icon name="forward" size={18} color="#FFFFFF" />
         </View>
@@ -66,7 +67,7 @@ function StatCard({ label, value, sub, subColor, accent, to }: { label: string; 
 function ChartCard({ icon, title, subtitle, right, children }: { icon: "staff" | "line-chart"; title: string; subtitle: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
     <View
-      style={{ gap: 15, shadowColor: "#000", shadowOpacity: 0.38, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
+      style={{ gap: 15, shadowColor: "#000", shadowOpacity: 0, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
       className="rounded-[15px] border border-line bg-card p-[15px]"
     >
       <PanelHeader icon={icon} title={title} subtitle={subtitle} right={right} />

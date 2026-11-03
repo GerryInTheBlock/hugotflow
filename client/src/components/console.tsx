@@ -42,7 +42,7 @@ export function Columns({ main, side }: { main: ReactNode; side: ReactNode }) {
   );
 }
 
-const panelShadow = { shadowColor: "#000", shadowOpacity: 0.38, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } };
+const panelShadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } };
 
 /** Large translucent panel ("Ledger panel", "Main panel"). */
 export function MainPanel({ children, gap = 14 }: { children: ReactNode; gap?: number }) {
@@ -67,7 +67,7 @@ export function PanelHeader({ title, subtitle, icon = "bell", right }: { title: 
   return (
     <View className="flex-row items-start gap-[10px]">
       <View
-        style={{ shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 } }}
+        style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 } }}
         className="h-[35px] w-[35px] items-center justify-center rounded-full bg-line"
       >
         <Icon name={icon} size={25} />
@@ -457,7 +457,7 @@ export function PopUp({ visible, onClose, width = 600, children }: { visible: bo
       <Pressable onPress={onClose} className="flex-1 items-center justify-center bg-black/60 p-4">
         <Pressable
           onPress={(e) => e.stopPropagation?.()}
-          style={{ width: "100%", maxWidth: width, maxHeight: "100%", shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
+          style={{ width: "100%", maxWidth: width, maxHeight: "100%", shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
           className="rounded-[15px] border border-line bg-card"
         >
           <ScrollView contentContainerStyle={{ padding: 24, gap: 14 }}>{children}</ScrollView>

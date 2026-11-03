@@ -13,7 +13,7 @@ import { isUrgent, listAlerts, type HighRiskAlert } from "@/lib/alerts";
 import { brandGlow, brandGradient } from "@/theme";
 import { Avatar } from "./members";
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 function greeting() {
   const h = Number(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila", hour: "numeric", hour12: false }));

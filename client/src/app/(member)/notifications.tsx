@@ -52,11 +52,11 @@ export default function NotificationsScreen() {
       {notes?.map((n) => (
         <View
           key={n.notification_id}
-          style={{ shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 20, shadowOffset: { width: 0, height: 0 } }}
+          style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 20, shadowOffset: { width: 0, height: 0 } }}
           className="flex-row items-start gap-3 rounded-card border border-line bg-card py-[15px] pl-[15px] pr-5"
         >
           <View
-            style={{ shadowColor: "#FF3B3B", shadowOpacity: 0.9, shadowRadius: 8, shadowOffset: { width: 0, height: 0 }, elevation: 4 }}
+            style={{ shadowColor: "#FF3B3B", shadowOpacity: 0, shadowRadius: 8, shadowOffset: { width: 0, height: 0 }, elevation: 4 }}
             className="h-[35px] w-[35px] items-center justify-center rounded-full bg-line"
           >
             <Icon name="bell" size={25} />

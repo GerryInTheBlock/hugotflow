@@ -14,7 +14,7 @@ import { dayMonth, manilaToday } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import { brandGlow, brandGradient } from "@/theme";
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 export function ReportChip({ status }: { status: Report["status"] }) {
   const style =

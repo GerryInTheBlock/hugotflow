@@ -155,7 +155,7 @@ export default function Onboarding() {
           <SvgXml xml={healthyHabitSvg} width={350} height={320} style={{ maxWidth: "100%" }} />
         </View>
         <View
-          style={{ shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
+          style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 30, shadowOffset: { width: 0, height: 0 } }}
           className="w-full gap-[10px] rounded-[15px] border border-line bg-card/50 p-5"
         >
           <Text className="font-bold text-xl text-ink">Safety first</Text>

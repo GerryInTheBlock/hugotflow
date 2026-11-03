@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth";
 import { isUrgent, listAlerts, STATUS_LABEL, type HighRiskAlert } from "@/lib/alerts";
 import { supabase } from "@/lib/supabase";
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 30, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function InstructorProfile() {

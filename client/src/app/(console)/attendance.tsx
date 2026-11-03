@@ -125,7 +125,7 @@ export default function AttendancePage() {
 
   const scanCard = (
     <View
-      style={{ shadowColor: "#000", shadowOpacity: 0.32, shadowRadius: 20, shadowOffset: { width: 0, height: 0 }, flex: wide ? 519 : undefined }}
+      style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 20, shadowOffset: { width: 0, height: 0 }, flex: wide ? 519 : undefined }}
       className="gap-[15px] rounded-card border border-line bg-card px-[15px] pb-5 pt-[10px]"
     >
       <View className="flex-row items-center justify-between gap-3">
@@ -161,7 +161,7 @@ export default function AttendancePage() {
 
   const modeCard = (
     <View
-      style={{ shadowColor: "#000", shadowOpacity: 0.32, shadowRadius: 20, shadowOffset: { width: 0, height: 0 }, flex: wide ? 261 : undefined }}
+      style={{ shadowColor: "#000", shadowOpacity: 0, shadowRadius: 20, shadowOffset: { width: 0, height: 0 }, flex: wide ? 261 : undefined }}
       className="justify-between gap-[15px] rounded-field border border-line bg-card px-[15px] pb-5 pt-[10px]"
     >
       <View className="gap-[15px]">

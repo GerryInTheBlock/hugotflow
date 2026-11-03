@@ -24,7 +24,7 @@ import { Icon } from "./Icon";
 import { OptionChip } from "./health";
 import { Button } from "./ui";
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 function RedStat({ label, value }: { label: string; value: string }) {
   return (

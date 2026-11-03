@@ -15,7 +15,7 @@ import { ISSUES, LOCATIONS, listEquipment, submitReport, type Equipment, type Is
 import { uploadPhoto, type Photo } from "@/lib/uploads";
 import { colors } from "@/theme";
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 /** Pill dropdown from Figma ("Treadmill 04 ⌄"); opens a list in place, with a search box for long lists. */
 function Dropdown({

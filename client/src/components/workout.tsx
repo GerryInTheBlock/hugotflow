@@ -19,7 +19,7 @@ export function todayLabel() {
   return `${DAYS[day]} · ${d} ${MONTHS[m - 1]}`;
 }
 
-export const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+export const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 export function planTitle(plan: Plan) {
   return `Today’s safe ${PROGRAMS[plan.predicted_class]?.title ?? "training"} plan`;

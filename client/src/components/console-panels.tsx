@@ -122,7 +122,7 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
 
   return (
     <View
-      style={{ gap: 20, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
+      style={{ gap: 20, shadowColor: "#000", shadowOpacity: 0, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
       className="rounded-field border border-divider bg-black/[0.03] p-[15px]"
     >
       <PanelHeader icon="checked-user" title="Live attendance" subtitle="Today's check-ins" />

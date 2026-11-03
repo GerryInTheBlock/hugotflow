@@ -18,7 +18,7 @@ import { brandGlow, brandGradient } from "@/theme";
 const PLAN_NAMES: Record<string, string> = { monthly: "Monthly", half_month: "Half-month", daily: "Daily" };
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+const shadow = { shadowColor: "#000", shadowOpacity: 0, shadowRadius: 15, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
 
 export default function MemberProfile() {
   const { profile, signOut } = useAuth();

@@ -60,7 +60,7 @@ export function SubScreen({
 export function BigCard({ children, gap = 12 }: { children: ReactNode; gap?: number }) {
   return (
     <View
-      style={{ gap, shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 30, shadowOffset: { width: 0, height: 0 }, elevation: 6 }}
+      style={{ gap, shadowColor: "#000", shadowOpacity: 0, shadowRadius: 30, shadowOffset: { width: 0, height: 0 }, elevation: 6 }}
       className="rounded-card border border-line bg-card p-5"
     >
       {children}
