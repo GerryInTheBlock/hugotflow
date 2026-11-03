@@ -54,3 +54,10 @@ Every push to `main` redeploys both services.
 - Database: new files in `supabase/migrations/` are applied to Supabase (after review) and committed.
 - Web + engine: push to `main`.
 - Android: run the EAS build again and share the new link (the app version is in `client/app.json`).
+
+## Current deployment (3 Nov 2026)
+| Part | Link |
+|---|---|
+| Web console + iPhone web app | https://hugotflow-web.onrender.com |
+| C4.5 engine | https://hugotflow-recommender.onrender.com (`/health`) |
+| Android APK, version 0.1.0 (build 1) | https://expo.dev/accounts/gerrytapuyo/projects/hugotflow/builds/7b3a27b0-740b-4894-8934-4c6727d7cf74 |
