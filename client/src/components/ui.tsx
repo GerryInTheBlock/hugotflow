@@ -6,6 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import type { ReactNode } from "react";
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -15,7 +16,6 @@ import {
   type ViewProps,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Rect } from "react-native-svg";
 import { backgroundGradient, brandGlow, brandGradient, colors } from "@/theme";
 
 export function Screen({
@@ -44,38 +44,21 @@ export function Screen({
   );
 }
 
-/**
- * One barbell end, side view: outer plate, inner plate, collar and the bar running towards the letters
- * (the plates on the Hugot Gym sign). `flip` mirrors it for the right-hand end.
- */
-function BarbellEnd({ height, color, flip }: { height: number; color: string; flip?: boolean }) {
-  const width = height * (44 / 46);
-  return (
-    <Svg width={width} height={height} viewBox="0 0 44 46" style={flip ? { transform: [{ scaleX: -1 }] } : undefined}>
-      <Rect x={0} y={3} width={9} height={40} rx={3.5} fill={color} />
-      <Rect x={11} y={8} width={7} height={30} rx={3} fill={color} />
-      <Rect x={20} y={15} width={4} height={16} rx={1.5} fill={color} />
-      <Rect x={24} y={20.5} width={20} height={5} rx={1} fill={color} />
-    </Svg>
-  );
-}
+/** The team's HugotFlow logo image (adviser review, Nov 2026): HUGOTFLOW with a red H and F between two barbells. */
+const LOGO = require("../../assets/images/logo.png");
+const LOGO_RATIO = 489 / 62;
 
-/**
- * HugotFlow logo (adviser review, Nov 2026): heavy upright HUGOTFLOW with a red H and F, between two barbell
- * ends, after the Hugot Gym sign. `size` = letter height in px; `tone="light"` is for red or dark backgrounds.
- */
-export function Logo({ size = 22, tone = "dark" }: { size?: number; tone?: "dark" | "light" }) {
-  const ink = tone === "light" ? colors["on-brand"] : colors.ink;
-  const accent = tone === "light" ? colors["on-brand"] : colors["logo-red"];
-  const bar = size * 1.05;
+/** HugotFlow logo. `size` = roughly the letter height in px; the image is shown at 1.25 × size tall. */
+export function Logo({ size = 22 }: { size?: number }) {
+  const height = size * 1.25;
   return (
-    <View accessibilityRole="image" accessibilityLabel="HugotFlow" style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-start" }}>
-      <BarbellEnd height={bar} color={ink} />
-      <Text style={{ fontFamily: "Poppins_900Black", fontSize: size, lineHeight: size * 1.15, color: ink, letterSpacing: -size * 0.02, marginHorizontal: size * 0.06, includeFontPadding: false }}>
-        <Text style={{ color: accent }}>H</Text>UGOT<Text style={{ color: accent }}>F</Text>LOW
-      </Text>
-      <BarbellEnd height={bar} color={ink} flip />
-    </View>
+    <Image
+      source={LOGO}
+      accessibilityRole="image"
+      accessibilityLabel="HugotFlow"
+      resizeMode="contain"
+      style={{ height, width: height * LOGO_RATIO, alignSelf: "flex-start" }}
+    />
   );
 }
 
