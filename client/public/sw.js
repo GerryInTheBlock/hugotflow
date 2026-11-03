@@ -2,8 +2,8 @@
  * offline check-in). Pages: network first, cached copy when offline. App files (hashed bundles,
  * fonts, icons): cache first. Supabase and other sites are never cached; check-ins made offline
  * are queued by the app itself (client/src/lib/attendance.ts). */
-const CACHE = "hugotflow-v1";
-const SHELL = ["/", "/manifest.json", "/icon.svg"];
+const CACHE = "hugotflow-v2";
+const SHELL = ["/", "/manifest.json", "/icon.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));

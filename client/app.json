@@ -17,12 +17,17 @@
       "edgeToEdgeEnabled": true,
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#E3061B"
+      }
     },
     "web": {
       "bundler": "metro",
       "output": "single",
-      "name": "HugotFlow"
+      "name": "HugotFlow",
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -45,6 +50,7 @@
         "projectId": "c5e47134-cf6b-4367-a36d-5105abe08c48"
       }
     },
-    "owner": "gerrytapuyo"
+    "owner": "gerrytapuyo",
+    "icon": "./assets/images/icon.png"
   }
 }

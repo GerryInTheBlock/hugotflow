@@ -15,6 +15,7 @@ import {
   type ViewProps,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Rect } from "react-native-svg";
 import { backgroundGradient, brandGlow, brandGradient, colors } from "@/theme";
 
 export function Screen({
@@ -43,12 +44,38 @@ export function Screen({
   );
 }
 
-/** "HugotFlow" wordmark: red H and F like the red H and G on the Hugot Gym sign. */
-export function Logo({ size = 22 }: { size?: number }) {
+/**
+ * One barbell end, side view: outer plate, inner plate, collar and the bar running towards the letters
+ * (the plates on the Hugot Gym sign). `flip` mirrors it for the right-hand end.
+ */
+function BarbellEnd({ height, color, flip }: { height: number; color: string; flip?: boolean }) {
+  const width = height * (44 / 46);
   return (
-    <Text style={{ fontSize: size, lineHeight: size * 1.3 }} className="font-black-italic text-ink">
-      <Text className="text-logo-red">H</Text>ugot<Text className="text-logo-red">F</Text>low
-    </Text>
+    <Svg width={width} height={height} viewBox="0 0 44 46" style={flip ? { transform: [{ scaleX: -1 }] } : undefined}>
+      <Rect x={0} y={3} width={9} height={40} rx={3.5} fill={color} />
+      <Rect x={11} y={8} width={7} height={30} rx={3} fill={color} />
+      <Rect x={20} y={15} width={4} height={16} rx={1.5} fill={color} />
+      <Rect x={24} y={20.5} width={20} height={5} rx={1} fill={color} />
+    </Svg>
+  );
+}
+
+/**
+ * HugotFlow logo (adviser review, Nov 2026): heavy upright HUGOTFLOW with a red H and F, between two barbell
+ * ends, after the Hugot Gym sign. `size` = letter height in px; `tone="light"` is for red or dark backgrounds.
+ */
+export function Logo({ size = 22, tone = "dark" }: { size?: number; tone?: "dark" | "light" }) {
+  const ink = tone === "light" ? colors["on-brand"] : colors.ink;
+  const accent = tone === "light" ? colors["on-brand"] : colors["logo-red"];
+  const bar = size * 1.05;
+  return (
+    <View accessibilityRole="image" accessibilityLabel="HugotFlow" style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-start" }}>
+      <BarbellEnd height={bar} color={ink} />
+      <Text style={{ fontFamily: "Poppins_900Black", fontSize: size, lineHeight: size * 1.15, color: ink, letterSpacing: -size * 0.02, marginHorizontal: size * 0.06, includeFontPadding: false }}>
+        <Text style={{ color: accent }}>H</Text>UGOT<Text style={{ color: accent }}>F</Text>LOW
+      </Text>
+      <BarbellEnd height={bar} color={ink} flip />
+    </View>
   );
 }
 
