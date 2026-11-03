@@ -5,7 +5,7 @@ const { colors } = require("./src/theme/tokens.json");
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
-  // The app is dark-only. "class" stops NativeWind throwing when the browser changes the page's color scheme.
+  // The app uses one light theme (adviser review, Nov 2026). "class" stops NativeWind throwing when the browser changes the page's color scheme.
   darkMode: "class",
   theme: {
     extend: {

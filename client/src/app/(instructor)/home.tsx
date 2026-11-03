@@ -22,7 +22,7 @@ function greeting() {
 
 function Shortcut({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} className="flex-1 flex-row items-center justify-between rounded-field bg-white/[0.06] p-[10px]" accessibilityRole="button">
+    <Pressable onPress={onPress} className="flex-1 flex-row items-center justify-between rounded-field bg-black/[0.04] p-[10px]" accessibilityRole="button">
       <View className="flex-row items-center gap-[5px]">
         <Icon name={icon} size={25} />
         <Text className="font-bold text-xs text-ink">{label}</Text>
@@ -46,8 +46,8 @@ export function AlertRow({ alert, highlight, onPress }: { alert: HighRiskAlert; 
           )}
         </View>
         <View className="flex-1">
-          <Text className="font-bold text-sm text-ink">{alert.member?.full_name ?? "Member"}</Text>
-          <Text className="font-medium text-[13px] text-ink-2" numberOfLines={1}>
+          <Text className={`font-bold text-sm ${highlight ? "text-on-brand" : "text-ink"}`}>{alert.member?.full_name ?? "Member"}</Text>
+          <Text className={`font-medium text-[13px] ${highlight ? "text-on-brand" : "text-ink-2"}`} numberOfLines={1}>
             {alert.constraint_summary}
           </Text>
         </View>
@@ -112,7 +112,7 @@ export default function InstructorHome() {
               </View>
               <Pressable onPress={() => router.navigate("/(instructor)/alerts")} style={[brandGlow, { borderRadius: 25, width: "100%" }]}>
                 <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 25, paddingVertical: 10, alignItems: "center" }}>
-                  <Text className="font-bold text-xs text-ink">Open Alert Queue</Text>
+                  <Text className="font-bold text-xs text-on-brand">Open Alert Queue</Text>
                 </LinearGradient>
               </Pressable>
             </View>

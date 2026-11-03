@@ -57,7 +57,24 @@ export type MembershipRow = {
   status: "active" | "expiring" | "expired" | "cancelled" | "no_plan";
   last_visit: string | null;
 };
-export type ReportKind = "attendance" | "payments" | "membership";
+export type ReportKind = "attendance" | "payments" | "membership" | "health";
+/** One row per active member: limitations (injuries), severity, goal, BMI, latest daily status (migration 0019). */
+export type HealthRow = {
+  user_id: string;
+  member: string;
+  age: number | null;
+  contact_number: string | null;
+  fitness_goal: string | null;
+  experience: string | null;
+  bmi: number | null;
+  joint_conditions: string[];
+  severity: "none" | "mild" | "moderate" | "severe";
+  daily_status: "good" | "soreness" | "pain" | null;
+  daily_area: string | null;
+  daily_date: string | null;
+  reviewed_at: string | null;
+  has_profile: boolean;
+};
 export type ExportFormat = "print" | "pdf" | "csv";
 export type ExportLog = { export_id: number; report: ReportKind; period: string; format: ExportFormat; created_at: string };
 
@@ -83,6 +100,7 @@ export const reportAttendance = (from: string, to: string, memberType: "all" | "
 export const reportPayments = async (from: string, to: string, status: string | null) =>
   num(await rpc<PaymentRow[]>("report_payments", { p_from: from, p_to: to, p_status: status }), ["amount"]);
 export const reportMembership = (asOf: string) => rpc<MembershipRow[]>("report_membership", { p_as_of: asOf });
+export const reportHealth = () => rpc<HealthRow[]>("report_health");
 
 export const logExport = (report: ReportKind, period: string, format: ExportFormat) =>
   rpc<void>("log_report_export", { p_report: report, p_period: period, p_format: format });

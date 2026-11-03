@@ -5,8 +5,8 @@
     "scheme": "hugotflow",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#0A0A0B",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F4F4F5",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,

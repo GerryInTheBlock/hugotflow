@@ -57,7 +57,7 @@ function StatusPill({ status }: { status: Equipment["maintenance_status"] }) {
 function TabGroup({ tab, onChange, pending, out }: { tab: Tab; onChange: (t: Tab) => void; pending: number; out: number }) {
   const items: [Tab, string, number | null, string][] = [
     ["all", "All Equipment", null, ""],
-    ["pending_review", "Pending Review", pending, "#EEDA00"],
+    ["pending_review", "Pending Review", pending, "#B45309"],
     ["out_of_order", "Out of order", out, colors["danger-ink"]],
   ];
   return (
@@ -171,7 +171,7 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
           <Text className="flex-shrink font-bold text-[36px] text-ink" numberOfLines={1} adjustsFontSizeToFit>
             {row.name}
           </Text>
-          <View className="h-[27px] justify-center rounded-chip bg-white/[0.06] px-[10px]">
+          <View className="h-[27px] justify-center rounded-chip bg-black/[0.04] px-[10px]">
             <Text className="font-medium text-xs text-ink">
               {row.maintenance_status === "pending_review" ? "Pending" : MACHINE_STATUS[row.maintenance_status]}
             </Text>
@@ -225,7 +225,7 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
             <Text className="font-bold text-base text-ink">Staff notes</Text>
             <Text className="font-medium text-[11px] text-ink-2">The member who reported this sees these notes in the app.</Text>
             {notes.map((n) => (
-              <View key={n.note_id} className="gap-[2px] rounded-field bg-white/[0.06] p-[10px]">
+              <View key={n.note_id} className="gap-[2px] rounded-field bg-black/[0.04] p-[10px]">
                 <Text className="font-semibold text-[10px] text-ink-2">
                   {n.author?.full_name ?? "Staff"} ({ROLE[(n.author?.role ?? "staff") as keyof typeof ROLE]}) · {clockTime(n.created_at)}
                 </Text>
@@ -257,9 +257,9 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
           <Pressable
             onPress={() => act("resolved", () => reviewReport(report.report_id, "resolved", note))}
             disabled={!!busy}
-            className="items-center rounded-field bg-white/[0.06] px-5 py-[10px]"
+            className="items-center rounded-field bg-black/[0.04] px-5 py-[10px]"
           >
-            {busy === "resolved" ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-xs" style={{ color: "#9C9C9C" }}>Mark Resolved</Text>}
+            {busy === "resolved" ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-xs" style={{ color: "#52525B" }}>Mark Resolved</Text>}
           </Pressable>
           <Pressable
             onPress={() => act("out", () => reviewReport(report.report_id, "out_of_order", note))}
@@ -270,7 +270,7 @@ function ReportPanel({ row, onChanged }: { row: Row | null; onChanged: () => voi
           </Pressable>
           <Pressable onPress={() => act("keep", () => reviewReport(report.report_id, "kept_available", note))} disabled={!!busy} style={[brandGlow, { borderRadius: 10 }]}>
             <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 10, paddingVertical: 10, alignItems: "center" }}>
-              {busy === "keep" ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-xs text-ink">Keep Available</Text>}
+              {busy === "keep" ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-xs text-on-brand">Keep Available</Text>}
             </LinearGradient>
           </Pressable>
         </View>
@@ -412,7 +412,7 @@ export default function EquipmentPage() {
               <Pressable onPress={() => setAdding(true)} style={[brandGlow, { borderRadius: 100 }]}>
                 <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, flexDirection: "row", alignItems: "center", paddingRight: 10, height: "100%" }}>
                   <Icon name="add-circle" size={30} color="#FFFFFF" />
-                  <Text className="font-medium text-xs text-ink">Add equipment</Text>
+                  <Text className="font-medium text-xs text-on-brand">Add equipment</Text>
                 </LinearGradient>
               </Pressable>
             </View>

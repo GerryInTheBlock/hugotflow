@@ -52,7 +52,7 @@ export default function InstructorProfile() {
           </View>
           <Text className="font-bold text-[32px] text-ink">{profile.full_name}</Text>
           <Text className="font-medium text-[13px] text-ink-2">On-call instructor{sinceText ? ` · ${sinceText}` : ""}</Text>
-          <View className="gap-2 rounded-field bg-white/[0.06] p-[15px]">
+          <View className="gap-2 rounded-field bg-black/[0.04] p-[15px]">
             {(
               [
                 ["Mobile", profile.contact_number ?? "—"],
@@ -80,7 +80,7 @@ export default function InstructorProfile() {
           </View>
           {alerts.length === 0 ? <Text className="font-medium text-sm text-ink-2">No alerts assigned to you.</Text> : null}
           {alerts.slice(0, 5).map((a) => (
-            <Pressable key={a.alert_id} onPress={() => router.push(`/(instructor)/alerts?open=${a.alert_id}` as never)} className="flex-row items-center justify-between rounded-field bg-white/[0.06] px-3 py-[10px]">
+            <Pressable key={a.alert_id} onPress={() => router.push(`/(instructor)/alerts?open=${a.alert_id}` as never)} className="flex-row items-center justify-between rounded-field bg-black/[0.04] px-3 py-[10px]">
               <View className="flex-1">
                 <Text className="font-bold text-sm text-ink">{a.member?.full_name ?? "Member"}</Text>
                 <Text className="font-medium text-xs text-ink-2" numberOfLines={1}>

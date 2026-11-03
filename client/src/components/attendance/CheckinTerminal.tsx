@@ -190,7 +190,7 @@ export function CheckinTerminal({
         <View className="flex-1">
           <WideButton label="Admit member" onPress={admit} loading={busy} disabled={!current} />
         </View>
-        <Pressable onPress={dayPass} className="flex-1 items-center justify-center rounded-field bg-white/[0.06] px-5 py-3">
+        <Pressable onPress={dayPass} className="flex-1 items-center justify-center rounded-field bg-black/[0.04] px-5 py-3">
           <Text className="font-bold text-sm text-ink">
             Generate {snap ? `₱${snap.settings.walkin_fee}`.replace(/\.0+$/, "") : "₱50"} Day Pass
           </Text>

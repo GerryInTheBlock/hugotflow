@@ -122,7 +122,7 @@ export function EntryPass({ variant = "member" }: { variant?: "member" | "instru
             <Pressable onPress={() => load()} style={[brandGlow, { borderRadius: 20 }]} accessibilityRole="button">
               <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 20, paddingVertical: 15, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
                 <Icon name="refresh" size={25} color="#FFFFFF" />
-                <Text className="font-bold text-sm text-ink">Refresh QR</Text>
+                <Text className="font-bold text-sm text-on-brand">Refresh QR</Text>
               </LinearGradient>
             </Pressable>
           ) : (
@@ -130,7 +130,7 @@ export function EntryPass({ variant = "member" }: { variant?: "member" | "instru
           )}
         </BigCard>
 
-        <View className="gap-[15px] rounded-field bg-white/[0.06] p-5">
+        <View className="gap-[15px] rounded-field bg-black/[0.04] p-5">
           <View className="flex-row items-center gap-[15px]">
             <Icon name="nav-engine" size={25} />
             <Text className="font-bold text-sm text-ink">{syncedAt ? `Synced ${minutesAgo(syncedAt)}` : "Not synced yet"}</Text>
@@ -148,7 +148,7 @@ export function EntryPass({ variant = "member" }: { variant?: "member" | "instru
               <Text className="font-bold text-sm text-ink">I'm at the front desk</Text>
             </Pressable>
             {showPin ? (
-              <View className="items-center gap-1 rounded-field bg-white/[0.06] p-4">
+              <View className="items-center gap-1 rounded-field bg-black/[0.04] p-4">
                 <Text className="font-medium text-sm text-ink-2">Tell the front desk your PIN</Text>
                 <Text className="font-extrabold text-[32px] tracking-[12px] text-ink">{profile.pin ?? "—"}</Text>
               </View>

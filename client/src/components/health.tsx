@@ -67,10 +67,10 @@ export function StepScreen({
                 </Pressable>
               ) : null}
             </View>
-            <Text className="font-bold text-[32px] text-ink" style={{ maxWidth: 260 }}>
+            <Text className="font-bold text-[32px] text-on-brand" style={{ maxWidth: 260 }}>
               {title}
             </Text>
-            {subtitle ? <Text className="font-medium text-base text-ink">{subtitle}</Text> : null}
+            {subtitle ? <Text className="font-medium text-base text-on-brand">{subtitle}</Text> : null}
             {children}
           </View>
         </ScrollView>
@@ -112,7 +112,7 @@ export function OptionChip({ label, on, onPress }: { label: string; on: boolean;
     return (
       <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: true }} style={[brandGlow, { borderRadius: 5 }]}>
         <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 5 }}>
-          <Text className="px-[15px] py-[10px] font-bold text-sm text-ink">{label}</Text>
+          <Text className="px-[15px] py-[10px] font-bold text-sm text-on-brand">{label}</Text>
         </LinearGradient>
       </Pressable>
     );
@@ -185,7 +185,7 @@ export function BmiCard({ bmi, label }: { bmi: number | null; label: string }) {
       >
         <View className="gap-[10px]">
           <Text className="font-bold text-sm text-ink-2">Calculated BMI</Text>
-          <Text className="font-bold text-[36px] text-ink">{bmi == null ? "—" : bmi.toFixed(1)}</Text>
+          <Text className="font-bold text-[36px] text-on-brand">{bmi == null ? "—" : bmi.toFixed(1)}</Text>
         </View>
         <Text className="max-w-[55%] text-right font-bold text-sm text-white">{label}</Text>
       </LinearGradient>
@@ -196,7 +196,7 @@ export function BmiCard({ bmi, label }: { bmi: number | null; label: string }) {
 /** Soft grey note with an icon (Figma: privacy notice, "Your answers help us…", locked note). */
 export function InfoNote({ icon = "check-mark", children, size = 12 }: { icon?: IconName; children: ReactNode; size?: 12 | 14 | 16 }) {
   return (
-    <View className="w-full flex-row items-start gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+    <View className="w-full flex-row items-start gap-[10px] rounded-field bg-black/[0.04] p-[15px]">
       <Icon name={icon} size={25} />
       <Text className="flex-1 font-medium text-ink-2" style={{ fontSize: size }}>
         {children}
@@ -250,7 +250,7 @@ export function PhotoBox({
         onPress={() => take(true)}
         accessibilityRole="button"
         accessibilityLabel={photo ? `Retake ${label}` : `Take a photo: ${label}`}
-        className="items-center justify-center overflow-hidden rounded-field border border-dashed border-brand bg-white/[0.08] p-[10px]"
+        className="items-center justify-center overflow-hidden rounded-field border border-dashed border-brand bg-black/[0.05] p-[10px]"
         style={{ minHeight: 72 }}
       >
         {photo ? (

@@ -66,9 +66,9 @@ export default function MemberProfile() {
                 colors={brandGradient}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={{ borderRadius: 50, paddingHorizontal: 15, paddingVertical: 5, borderWidth: 1, borderColor: "#3F3F46" }}
+                style={{ borderRadius: 50, paddingHorizontal: 15, paddingVertical: 5, borderWidth: 1, borderColor: "#D4D4D8" }}
               >
-                <Text className="font-semibold text-base text-ink">See Membership</Text>
+                <Text className="font-semibold text-base text-on-brand">See Membership</Text>
               </LinearGradient>
             </Pressable>
           </View>
@@ -87,7 +87,7 @@ export default function MemberProfile() {
                   {profile.photo_url ? (
                     <Image source={{ uri: profile.photo_url }} style={{ width: 60, height: 60 }} />
                   ) : (
-                    <Text className="font-extrabold text-xl text-ink">{initials}</Text>
+                    <Text className="font-extrabold text-xl text-on-brand">{initials}</Text>
                   )}
                 </LinearGradient>
               </View>

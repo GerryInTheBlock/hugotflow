@@ -147,7 +147,7 @@ export default function WorkoutTab() {
         {header}
         <View className="gap-[25px]">
           {body}
-          <View className="gap-[10px] rounded-field bg-white/[0.06] px-5 py-[15px]">
+          <View className="gap-[10px] rounded-field bg-black/[0.04] px-5 py-[15px]">
             <Text className="font-bold text-base text-ink">Your progress</Text>
             <View className="flex-row justify-between">
               <Text className="font-medium text-sm text-ink-2">

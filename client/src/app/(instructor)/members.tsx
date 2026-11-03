@@ -54,7 +54,7 @@ export function Avatar({ name, photo, size = 60 }: { name: string; photo?: strin
         end={{ x: 1, y: 0 }}
         style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", alignItems: "center", justifyContent: "center" }}
       >
-        {photo ? <Image source={{ uri: photo }} style={{ width: size, height: size }} /> : <Text className="font-extrabold text-xl text-ink">{initials}</Text>}
+        {photo ? <Image source={{ uri: photo }} style={{ width: size, height: size }} /> : <Text className="font-extrabold text-xl text-on-brand">{initials}</Text>}
       </LinearGradient>
     </View>
   );
@@ -135,7 +135,7 @@ export default function InstructorMembers() {
             {statusOnly ? (
               <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 5, height: "100%", flexDirection: "row", alignItems: "center", paddingLeft: 5, paddingRight: 10, borderWidth: 1, borderColor: "#3F3F46" }}>
                 <Icon name="adjust" size={25} color="#FFFFFF" />
-                <Text className="font-medium text-xs text-ink">Status</Text>
+                <Text className="font-medium text-xs text-on-brand">Status</Text>
               </LinearGradient>
             ) : (
               <View style={{ height: "100%", flexDirection: "row", alignItems: "center", paddingLeft: 5, paddingRight: 10 }} className="rounded-chip border border-line-strong bg-card">
@@ -201,7 +201,7 @@ export default function InstructorMembers() {
                   ) : null}
                   {r.consentPending ? (
                     <View className="px-[10px] py-[5px]">
-                      <Text className="font-extrabold text-sm" style={{ color: "#F59E0B" }}>
+                      <Text className="font-extrabold text-sm" style={{ color: "#B45309" }}>
                         Guardian consent to check
                       </Text>
                     </View>
@@ -215,11 +215,11 @@ export default function InstructorMembers() {
                 {flagged ? (
                   <Pressable onPress={() => router.push(`/(instructor)/member/${r.user_id}` as never)} style={[brandGlow, { borderRadius: 100 }]}>
                     <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, paddingVertical: 10, alignItems: "center" }}>
-                      <Text className="font-bold text-xs text-ink">Open Profile</Text>
+                      <Text className="font-bold text-xs text-on-brand">Open Profile</Text>
                     </LinearGradient>
                   </Pressable>
                 ) : (
-                  <Pressable onPress={() => router.push(`/(instructor)/member/${r.user_id}` as never)} className="items-center rounded-full bg-white/[0.06] py-[10px]">
+                  <Pressable onPress={() => router.push(`/(instructor)/member/${r.user_id}` as never)} className="items-center rounded-full bg-black/[0.04] py-[10px]">
                     <Text className="font-bold text-xs text-ink">{r.health ? "Open Profile" : "View member"}</Text>
                   </Pressable>
                 )}

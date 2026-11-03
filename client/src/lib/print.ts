@@ -11,19 +11,36 @@ export type PrintableReport = {
   header: string[];
   rows: string[][];
   note?: string;
+  /** Reporting period shown under the title, e.g. "October 2026" or "as of 03 Nov 2026". */
+  period?: string;
+  /** Who generated it, for the "Prepared by" signature line, e.g. "Merly Belo, Owner". */
+  preparedBy?: string;
 };
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
+/**
+ * Formal printed report (adviser review, Nov 2026): letterhead with the gym's name and address, report title and
+ * period, totals, the full table, a "Prepared by / Noted by" signature block, and "Page x of y" on every page.
+ */
 export function reportHtml(r: PrintableReport) {
+  const [gymName, ...addr] = r.gym.split("·").map((s) => s.trim());
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(r.title)}</title>
 <style>
-  @page { size: A4; margin: 14mm; }
+  @page { size: A4; margin: 14mm 14mm 18mm; @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 9px; color: #555; } @bottom-left { content: "HugotFlow · ${esc(gymName)}"; font-size: 9px; color: #555; } }
   * { box-sizing: border-box; }
   body { font-family: Poppins, "Segoe UI", Arial, sans-serif; color: #111; margin: 0; font-size: 11px; }
-  .gym { font-size: 10px; color: #555; letter-spacing: .02em; }
-  h1 { font-size: 18px; margin: 6px 0 2px; }
-  .gen { font-size: 10px; color: #555; margin-bottom: 12px; }
+  .head { text-align: center; border-bottom: 2px solid #E3061B; padding-bottom: 8px; margin-bottom: 12px; }
+  .head .name { font-size: 18px; font-weight: 800; letter-spacing: .06em; }
+  .head .addr { font-size: 10px; color: #444; }
+  .head .sys { font-size: 9px; color: #777; margin-top: 2px; }
+  h1 { font-size: 15px; margin: 6px 0 2px; text-align: center; text-transform: uppercase; letter-spacing: .04em; }
+  .period { text-align: center; font-size: 11px; margin-bottom: 4px; }
+  .gen { font-size: 9px; color: #555; margin-bottom: 12px; text-align: center; }
+  .sign { display: flex; gap: 40px; margin-top: 36px; page-break-inside: avoid; }
+  .sign div { flex: 1; font-size: 10px; }
+  .sign .line { border-top: 1px solid #111; margin-top: 34px; padding-top: 3px; font-weight: 600; }
+  .sign .role { color: #555; font-weight: 400; }
   .totals { display: flex; gap: 10px; margin-bottom: 14px; }
   .total { flex: 1; border: 1px solid #ccc; border-radius: 8px; padding: 8px 10px; }
   .total span { display: block; font-size: 9px; color: #555; }
@@ -35,13 +52,15 @@ export function reportHtml(r: PrintableReport) {
   thead { display: table-header-group; }
   .note { margin-top: 10px; font-size: 9px; color: #555; }
 </style></head><body>
-<div class="gym">${esc(r.gym)}</div>
-<h1>${esc(r.title)}</h1>
+<div class="head"><div class="name">${esc(gymName.toUpperCase())}</div>${addr.length ? `<div class="addr">${esc(addr.join(", "))}</div>` : ""}<div class="sys">HugotFlow Gym Management System</div></div>
+<h1>${esc(r.title.split(" — ")[0])}</h1>
+${r.period ? `<div class="period">${esc(r.period)}</div>` : ""}
 <div class="gen">${esc(r.generated)}</div>
 <div class="totals">${r.totals.map(([k, v]) => `<div class="total"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("")}</div>
 <table><thead><tr>${r.header.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
 <tbody>${r.rows.length ? r.rows.map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${r.header.length}">No records for this period.</td></tr>`}</tbody></table>
 ${r.note ? `<div class="note">${esc(r.note)}</div>` : ""}
+<div class="sign"><div>Prepared by:<div class="line">${esc(r.preparedBy?.split(",")[0] ?? "")}&nbsp;<div class="role">${esc(r.preparedBy?.split(",").slice(1).join(",").trim() || "Signature over printed name")}</div></div></div><div>Noted by:<div class="line">&nbsp;<div class="role">Gym Owner / Manager</div></div></div></div>
 </body></html>`;
 }
 

@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Text, View, type LayoutChangeEvent } from "react-native";
 import Svg, { Defs, G, Line, LinearGradient, Path, Rect, Stop, Text as SvgText } from "react-native-svg";
 
-const GRID = "#3F3F46";
-const LABEL = "#A1A1AA";
+const GRID = "#E4E4E7";
+const LABEL = "#52525B";
 const RED = "#E3061B";
 
 function useWidth(initial = 600) {
@@ -126,7 +126,7 @@ export function BarChart({ data, height = 200 }: { data: { label: string; a: num
           const cx = left + slot * i + slot / 2;
           return (
             <G key={d.label}>
-              <Rect x={cx - bar - 3} y={y(d.a)} width={bar} height={top + plotH - y(d.a)} rx={3} fill="#52525B" />
+              <Rect x={cx - bar - 3} y={y(d.a)} width={bar} height={top + plotH - y(d.a)} rx={3} fill="#A1A1AA" />
               <Rect x={cx + 3} y={y(d.b)} width={bar} height={top + plotH - y(d.b)} rx={3} fill="url(#subFill)" />
               <SvgText x={cx} y={height - 6} fill={LABEL} fontSize={10} textAnchor="middle">
                 {d.label}

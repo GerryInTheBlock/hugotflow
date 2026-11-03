@@ -133,7 +133,7 @@ export function WalkinModal({
         <Input value={ref} onChangeText={setRef} editable={method === "gcash"} keyboardType="number-pad" placeholder="Only for GCash payments" />
       </View>
 
-      <View className="gap-[6px] rounded-field bg-white/[0.06] p-[14px]">
+      <View className="gap-[6px] rounded-field bg-black/[0.04] p-[14px]">
         <KeyValue label="Pass valid" value={`${hours} hours from first scan${settings?.reentry_allowed === false ? "" : " · re-entry included"}`} />
         <KeyValue label="Amount" value={peso(amount)} />
         <KeyValue label="Recorded by" value={profile ? `${profile.full_name} (${roleName[profile.role] ?? profile.role})` : "—"} />
@@ -144,7 +144,7 @@ export function WalkinModal({
       {error ? <Note tone="danger">{error}</Note> : null}
 
       <View className="flex-row gap-[10px]">
-        <Pressable onPress={onClose} className="flex-1 items-center justify-center rounded-field bg-white/[0.06] px-5 py-3">
+        <Pressable onPress={onClose} className="flex-1 items-center justify-center rounded-field bg-black/[0.04] px-5 py-3">
           <Text className="font-bold text-sm text-ink">Cancel</Text>
         </Pressable>
         <View className="flex-1">

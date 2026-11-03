@@ -47,7 +47,7 @@ const panelShadow = { shadowColor: "#000", shadowOpacity: 0.38, shadowRadius: 25
 /** Large translucent panel ("Ledger panel", "Main panel"). */
 export function MainPanel({ children, gap = 14 }: { children: ReactNode; gap?: number }) {
   return (
-    <View style={[panelShadow, { gap }]} className="grow rounded-[15px] bg-white/[0.04] p-5">
+    <View style={[panelShadow, { gap }]} className="grow rounded-[15px] bg-black/[0.03] p-5">
       {children}
     </View>
   );
@@ -108,7 +108,7 @@ export function Chips<T extends string>({
     <View className="flex-row flex-wrap gap-2">
       {options.map((o) => {
         const on = o.value === value;
-        const label = <Text className="font-bold text-xs text-ink">{o.label}</Text>;
+        const label = <Text className={`font-bold text-xs ${on ? "text-on-brand" : "text-ink"}`}>{o.label}</Text>;
         if (on) {
           return (
             <Pressable key={o.value} onPress={() => onChange(o.value)} style={[brandGlow, { borderRadius: 5 }]}>
@@ -241,9 +241,9 @@ function cell(content: ReactNode, log = false) {
 
 const badgeTone = {
   ok: ["bg-ok/20", "text-ok-ink"],
-  warn: ["bg-warn", "text-ink"],
+  warn: ["bg-warn", "text-on-brand"],
   info: ["bg-info", "text-ink"],
-  danger: ["bg-danger", "text-ink"],
+  danger: ["bg-danger", "text-on-brand"],
   neutral: ["bg-field", "text-ink"],
   plum: ["bg-plum", "text-ink"],
 } as const;
@@ -255,7 +255,7 @@ export function SmallBadge({ label, tone = "neutral" }: { label: string; tone?: 
     return (
       <View style={[brandGlow, { borderRadius: 100, alignSelf: "flex-start" }]}>
         <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, paddingHorizontal: 10, paddingVertical: 4 }}>
-          <Text className="font-semibold text-[10px] text-ink">{label}</Text>
+          <Text className="font-semibold text-[10px] text-on-brand">{label}</Text>
         </LinearGradient>
       </View>
     );
@@ -283,8 +283,8 @@ export function SmallButton({
   disabled?: boolean;
 }) {
   const off = disabled || loading;
-  const text = loading ? <ActivityIndicator size="small" color={colors.ink} /> : (
-    <Text className={`font-bold text-[13px] ${variant === "danger" ? "text-danger-ink" : "text-ink"}`}>{label}</Text>
+  const text = loading ? <ActivityIndicator size="small" color={variant === "primary" ? colors["on-brand"] : colors.ink} /> : (
+    <Text className={`font-bold text-[13px] ${variant === "danger" ? "text-danger-ink" : variant === "primary" ? "text-on-brand" : "text-ink"}`}>{label}</Text>
   );
   if (variant === "primary") {
     return (
@@ -296,7 +296,7 @@ export function SmallButton({
     );
   }
   return (
-    <Pressable onPress={onPress} disabled={off} style={{ opacity: off ? 0.6 : 1 }} className="self-start rounded-field bg-white/[0.06] px-3 py-1">
+    <Pressable onPress={onPress} disabled={off} style={{ opacity: off ? 0.6 : 1 }} className="self-start rounded-field bg-black/[0.04] px-3 py-1">
       {text}
     </Pressable>
   );
@@ -305,7 +305,7 @@ export function SmallButton({
 /** Full-width primary action (Figma "Save & issue receipt", "Add account"): 13 px, 12 px tall padding. */
 export function WideButton({ label, onPress, loading, disabled, variant = "primary" }: { label: string; onPress?: () => void; loading?: boolean; disabled?: boolean; variant?: "primary" | "outline" }) {
   const off = disabled || loading;
-  const inner = loading ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-[13px] text-ink">{label}</Text>;
+  const inner = loading ? <ActivityIndicator color={variant === "primary" ? colors["on-brand"] : colors.ink} /> : <Text className={`font-bold text-[13px] ${variant === "primary" ? "text-on-brand" : "text-ink"}`}>{label}</Text>;
   if (variant === "outline") {
     return (
       <Pressable onPress={onPress} disabled={off} style={{ opacity: off ? 0.6 : 1 }} className="items-center rounded-[20px] border border-line bg-card px-5 py-3">
@@ -334,7 +334,7 @@ export function AlertPill({ icon, label, onPress }: { icon: IconName; label: str
       >
         <View className="flex-row items-center gap-[10px]">
           <Icon name={icon} size={25} color="#FFFFFF" />
-          <Text className="font-bold text-xs text-ink">{label}</Text>
+          <Text className="font-bold text-xs text-on-brand">{label}</Text>
         </View>
         <Icon name="forward" size={20} color="#FFFFFF" />
       </LinearGradient>
@@ -368,7 +368,7 @@ export function KeyValue({ label, value }: { label: string; value: ReactNode }) 
 
 export function Note({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "danger" }) {
   return (
-    <View className={`rounded-field p-3 ${tone === "danger" ? "bg-danger/20" : "bg-white/[0.06]"}`}>
+    <View className={`rounded-field p-3 ${tone === "danger" ? "bg-danger/20" : "bg-black/[0.04]"}`}>
       <Text className={`font-medium text-[11px] ${tone === "danger" ? "text-danger-ink" : "text-ink-2"}`}>{children}</Text>
     </View>
   );

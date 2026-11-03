@@ -348,7 +348,7 @@ function PaymentActions({ payment: p, isOwner, refunded, onChanged }: { payment:
   }
 
   return (
-    <View className="gap-3 rounded-field bg-white/[0.04] p-3">
+    <View className="gap-3 rounded-field bg-black/[0.03] p-3">
       <KeyValue label="Recorded" value={dateTime(p.created_at)} />
       {p.gcash_reference ? <KeyValue label="GCash ref." value={p.gcash_reference} /> : null}
       {p.confirmed_at ? <KeyValue label="Reviewed" value={dateTime(p.confirmed_at)} /> : null}
@@ -541,7 +541,7 @@ function RecordPanel({ initialMemberId, initialPlan, onRecorded }: { initialMemb
           <Input value={query} onChangeText={setQuery} placeholder="Search name, phone or PIN" />
         )}
         {results.map((r) => (
-          <Pressable key={r.user_id} onPress={() => { setPerson(r); setQuery(""); }} className="rounded-field bg-white/[0.04] px-3 py-2">
+          <Pressable key={r.user_id} onPress={() => { setPerson(r); setQuery(""); }} className="rounded-field bg-black/[0.03] px-3 py-2">
             <Text className="font-semibold text-xs text-ink">{r.full_name}</Text>
             <Text className="font-medium text-[11px] text-ink-2">{r.contact_number ?? "No mobile"} · PIN {r.pin ?? "—"}</Text>
           </Pressable>
@@ -589,7 +589,7 @@ function RecordPanel({ initialMemberId, initialPlan, onRecorded }: { initialMemb
         </View>
       ) : null}
 
-      <View className="flex-row items-center justify-between rounded-field bg-white/[0.06] p-3">
+      <View className="flex-row items-center justify-between rounded-field bg-black/[0.04] p-3">
         <View>
           <Text className="font-medium text-[11px] text-ink-2">Total</Text>
           <Text className="font-medium text-[11px] text-ink-2">{covers}</Text>
@@ -626,7 +626,7 @@ function ReceiptPanel({ transactionId, onDone }: { transactionId: string; onDone
       {receipt ? (
         <>
           <Text className="font-bold text-[32px] text-ink">{peso(receipt.amount)}</Text>
-          <View className="gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+          <View className="gap-[10px] rounded-field bg-black/[0.04] p-[15px]">
             {rows.map(([k, v]) => (
               <KeyValue key={k} label={k} value={v} />
             ))}

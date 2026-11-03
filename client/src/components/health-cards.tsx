@@ -30,8 +30,8 @@ function RedStat({ label, value }: { label: string; value: string }) {
   return (
     <View style={[brandGlow, { flex: 1, borderRadius: 20 }]}>
       <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 20, padding: 15, gap: 5, flex: 1 }}>
-        <Text className="font-medium text-sm text-ink">{label}</Text>
-        <Text className="font-bold text-2xl text-ink" numberOfLines={1} adjustsFontSizeToFit>
+        <Text className="font-medium text-sm text-on-brand">{label}</Text>
+        <Text className="font-bold text-2xl text-on-brand" numberOfLines={1} adjustsFontSizeToFit>
           {value}
         </Text>
       </LinearGradient>
@@ -77,7 +77,7 @@ export function HealthCard({ health, consent, editHref }: { health: HealthProfil
           </Text>
           {consentLine[consent] ? (
             <Pressable onPress={() => router.push("/(member)/guardian-consent" as never)}>
-              <Text className="font-semibold text-sm" style={{ color: "#F59E0B" }}>
+              <Text className="font-semibold text-sm" style={{ color: "#B45309" }}>
                 {consentLine[consent]} →
               </Text>
             </Pressable>
@@ -118,15 +118,15 @@ export function DailyStatusCard({ today, onSaved }: { today: DailyStatus | null;
     }
   };
 
-  const dot = today?.status === "good" ? colors["ok-ink"] : today?.status === "soreness" ? "#F59E0B" : colors["danger-ink"];
+  const dot = today?.status === "good" ? colors["ok-ink"] : today?.status === "soreness" ? "#B45309" : colors["danger-ink"];
   return (
-    <View className="w-full gap-[15px] rounded-field bg-white/[0.06] p-5">
+    <View className="w-full gap-[15px] rounded-field bg-black/[0.04] p-5">
       <Text className="font-bold text-base text-ink">Daily status</Text>
       <Text className="font-medium text-sm text-ink-2">
         {today ? `Last confirmed today · ${clockTime(today.created_at)}` : "Not confirmed today"}
       </Text>
       {today ? (
-        <View className="w-full flex-row items-center gap-[15px] rounded-field bg-white/[0.08] p-[15px]">
+        <View className="w-full flex-row items-center gap-[15px] rounded-field bg-black/[0.05] p-[15px]">
           <Text className="font-bold text-xl" style={{ color: dot, lineHeight: 20 }}>
             •
           </Text>

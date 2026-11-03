@@ -71,14 +71,14 @@ export function MyAttendance({ variant = "member" }: { variant?: "member" | "ins
             {variant === "member" ? (
               <Pressable onPress={() => router.push("/(member)/membership")} style={[brandGlow, { borderRadius: 50 }]}>
                 <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 50, paddingHorizontal: 15, paddingVertical: 5, borderWidth: 1, borderColor: "#3F3F46" }}>
-                  <Text className="font-semibold text-sm text-ink">See Membership</Text>
+                  <Text className="font-semibold text-sm text-on-brand">See Membership</Text>
                 </LinearGradient>
               </Pressable>
             ) : (
               <View style={[brandGlow, { borderRadius: 50 }]}>
                 <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 50, paddingHorizontal: 15, paddingVertical: 5, flexDirection: "row", alignItems: "center", gap: 6 }}>
                   <View className="h-[6px] w-[6px] rounded-full bg-ok-ink" />
-                  <Text className="font-semibold text-sm text-ink">Active</Text>
+                  <Text className="font-semibold text-sm text-on-brand">Active</Text>
                 </LinearGradient>
               </View>
             )}
@@ -101,13 +101,13 @@ export function MyAttendance({ variant = "member" }: { variant?: "member" | "ins
             <Pressable onPress={() => router.push(entryRoute)} style={[brandGlow, { borderRadius: 20 }]}>
               <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 20, paddingVertical: 15, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
                 <Icon name="qr-code-large" size={30} color="#FFFFFF" />
-                <Text className="font-regular text-base text-ink">|</Text>
-                <Text className="font-bold text-sm text-ink">Show my entry QR</Text>
+                <Text className="font-regular text-base text-on-brand">|</Text>
+                <Text className="font-bold text-sm text-on-brand">Show my entry QR</Text>
               </LinearGradient>
             </Pressable>
           </View>
 
-          <View className="gap-[10px] rounded-field bg-white/[0.06] p-5">
+          <View className="gap-[10px] rounded-field bg-black/[0.04] p-5">
             <View className="flex-row items-center justify-between">
               <Text className="font-bold text-base text-ink">Today’s Entry</Text>
               <Text className="font-medium text-sm text-ink-2">{todays.length ? `Checked in ${clockTime(todays[todays.length - 1].checkin_at)}` : "Not checked in"}</Text>
@@ -147,7 +147,7 @@ export function MyAttendance({ variant = "member" }: { variant?: "member" | "ins
 
           <View className="gap-[10px]">
             <Text className="font-bold text-base text-ink">Recent activity</Text>
-            <View className="gap-[15px] rounded-field bg-white/[0.06] p-5">
+            <View className="gap-[15px] rounded-field bg-black/[0.04] p-5">
               {visits === null ? <Text className="font-medium text-sm text-ink-3">Loading…</Text> : null}
               {visits?.length === 0 ? <Text className="font-medium text-sm text-ink-3">No visits this month yet.</Text> : null}
               {visits?.slice(0, 6).map((v, i) => (

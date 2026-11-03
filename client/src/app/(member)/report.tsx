@@ -19,10 +19,10 @@ const shadow = { shadowColor: "#000", shadowOpacity: 0.6, shadowRadius: 15, shad
 export function ReportChip({ status }: { status: Report["status"] }) {
   const style =
     status === "resolved" || status === "kept_available"
-      ? { bg: "rgba(22,163,74,0.22)", fg: "#4ADE80" }
+      ? { bg: "rgba(22,163,74,0.22)", fg: "#15803D" }
       : status === "out_of_order"
         ? { bg: "#DC2626", fg: "#FFFFFF" }
-        : { bg: "#A1A1AA", fg: "#FFFFFF" };
+        : { bg: "#E4E4E7", fg: "#3F3F46" };
   return (
     <View style={{ backgroundColor: style.bg }} className="rounded-chip px-[10px] py-[2px]">
       <Text style={{ color: style.fg }} className="font-bold text-[10px]">
@@ -78,14 +78,14 @@ export default function ReportTab() {
                 style={{ borderRadius: 20, paddingVertical: 15, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}
               >
                 <Icon name="plus-math" size={25} color="#FFFFFF" />
-                <Text className="font-bold text-sm text-ink">Report an issue</Text>
+                <Text className="font-bold text-sm text-on-brand">Report an issue</Text>
               </LinearGradient>
             </Pressable>
           </View>
 
           <View className="gap-[10px]">
             <Text className="font-bold text-base text-ink">Your reports</Text>
-            <View className="flex-row items-stretch justify-between rounded-field bg-white/[0.06] p-5">
+            <View className="flex-row items-stretch justify-between rounded-field bg-black/[0.04] p-5">
               {(
                 [
                   [reports.length, "Submitted"],
@@ -106,7 +106,7 @@ export default function ReportTab() {
 
           <View className="gap-[10px]">
             <Text className="font-bold text-base text-ink">Recent reports</Text>
-            <View className="gap-[15px] rounded-field bg-white/[0.06] p-5">
+            <View className="gap-[15px] rounded-field bg-black/[0.04] p-5">
               {reports.length === 0 ? (
                 <Text className="font-medium text-sm text-ink-2">No reports yet. Thanks for helping keep Hugot Gym safe.</Text>
               ) : (

@@ -94,7 +94,7 @@ export default function DayPassScreen() {
             detail={`Valid ${waiting.validity_hours} hours${settings?.reentry_allowed === false ? "" : ", re-entry included"}`}
           />
         </BigCard>
-        <View className="rounded-field bg-white/[0.06] p-[15px]">
+        <View className="rounded-field bg-black/[0.04] p-[15px]">
           <Text className="font-medium text-[13px] text-ink-2">
             Paying cash? Show this screen at the front desk. Staff can also issue a pass for you there if you forgot your phone.
           </Text>
@@ -136,7 +136,7 @@ export default function DayPassScreen() {
             </>
           ) : (
             <>
-              <View className="gap-[5px] rounded-field bg-white/[0.06] p-5">
+              <View className="gap-[5px] rounded-field bg-black/[0.04] p-5">
                 <Text className="font-medium text-sm text-ink-2">Payment Method</Text>
                 <View className="flex-row flex-wrap gap-[10px]">
                   {(["gcash", "cash"] as const).map((m) => (
@@ -145,7 +145,7 @@ export default function DayPassScreen() {
                 </View>
               </View>
               {method === "gcash" ? (
-                <View className="flex-row items-center justify-between gap-2 rounded-field bg-white/[0.06] p-5">
+                <View className="flex-row items-center justify-between gap-2 rounded-field bg-black/[0.04] p-5">
                   <Text numberOfLines={1} className="flex-shrink-0 font-medium text-sm text-ink-2">
                     GCash reference no. (optional)
                   </Text>
@@ -172,7 +172,7 @@ export default function DayPassScreen() {
           <View className="gap-[10px]">
             <Text className="font-bold text-base text-ink">Previous pass</Text>
             {previous.map((p) => (
-              <View key={p.pass_id} className="h-[59px] flex-row items-center justify-between rounded-field bg-white/[0.06] px-5">
+              <View key={p.pass_id} className="h-[59px] flex-row items-center justify-between rounded-field bg-black/[0.04] px-5">
                 <Text className="font-medium text-sm text-ink-2">Used</Text>
                 <Text className="font-extrabold text-base text-ink">
                   {dayMonth(p.first_scan_at!)} {time(p.first_scan_at!)} - {time(p.expires_at!)}
@@ -187,7 +187,7 @@ export default function DayPassScreen() {
 }
 
 function MethodChip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
-  const text = <Text className="font-bold text-sm text-ink">{label}</Text>;
+  const text = <Text className={`font-bold text-sm ${on ? "text-on-brand" : "text-ink"}`}>{label}</Text>;
   if (on) {
     return (
       <Pressable onPress={onPress} style={[brandGlow, { borderRadius: 5 }]}>

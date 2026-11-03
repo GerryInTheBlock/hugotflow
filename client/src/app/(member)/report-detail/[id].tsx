@@ -85,7 +85,7 @@ export default function ReportDetail() {
           </Text>
         ) : (
           notes.map((n) => (
-            <View key={n.note_id} className="gap-[2px] rounded-field bg-white/[0.06] p-[10px]">
+            <View key={n.note_id} className="gap-[2px] rounded-field bg-black/[0.04] p-[10px]">
               <Text className="font-semibold text-[11px] text-ink-2">
                 {n.author ?? "Staff"} ({ROLE[n.author_role ?? "staff"] ?? "Staff"}) · {dayMonth(n.created_at)}, {clockTime(n.created_at)}
               </Text>

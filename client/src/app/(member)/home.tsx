@@ -78,7 +78,7 @@ export default function MemberHome() {
           </Pressable>
           <Pressable onPress={() => router.navigate("/(member)/profile")} style={[brandGlow, { width: 60, height: 60, borderRadius: 30 }]}>
             <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ width: 60, height: 60, borderRadius: 30, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-              {profile?.photo_url ? <Image source={{ uri: profile.photo_url }} style={{ width: 60, height: 60 }} /> : <Text className="font-extrabold text-xl text-ink">{initials}</Text>}
+              {profile?.photo_url ? <Image source={{ uri: profile.photo_url }} style={{ width: 60, height: 60 }} /> : <Text className="font-extrabold text-xl text-on-brand">{initials}</Text>}
             </LinearGradient>
           </Pressable>
         </View>
@@ -109,7 +109,7 @@ export default function MemberHome() {
         </View>
       </View>
 
-      <Pressable onPress={() => router.navigate("/(member)/attendance")} className="gap-[5px] rounded-field bg-white/[0.06] p-5">
+      <Pressable onPress={() => router.navigate("/(member)/attendance")} className="gap-[5px] rounded-field bg-black/[0.04] p-5">
         <View className="flex-row items-center justify-between">
           <Text className="font-bold text-base text-ink">Attendance Summary</Text>
           <Icon name="arrow-right" size={25} />
@@ -124,7 +124,7 @@ export default function MemberHome() {
 
 function QuickAction({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} className="flex-1 items-center justify-center gap-[10px] rounded-field bg-white/[0.06] p-[10px]">
+    <Pressable onPress={onPress} className="flex-1 items-center justify-center gap-[10px] rounded-field bg-black/[0.04] p-[10px]">
       <View className="items-center">
         <Icon name={icon} size={25} />
         <Text className="font-bold text-sm text-ink">{label}</Text>

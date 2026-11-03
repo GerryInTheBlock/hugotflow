@@ -110,3 +110,19 @@ reset role;
 set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000d';
 insert into report_exports (report, period, format, created_by) values ('attendance', 'x', 'csv', '00000000-0000-0000-0000-00000000000d');
 reset role;
+
+-- RP17 staff cannot read the health records report (health data, RA 10173) → ERROR "Only the owner…"
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000b';
+select 'RP17 staff health' as t, count(*) as n from report_health();
+reset role;
+
+-- RP18 owner: one row per active member → true | Maria's limitations are listed → true
+set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-00000000000a';
+select 'RP18 health rows' as t,
+       (select count(*) from report_health()) = (select count(*) from users where role = 'member' and is_active) as one_per_member,
+       (select cardinality(joint_conditions) > 0 from report_health() where member = 'Maria Santos') as maria_listed;
+
+-- RP19 a health records export is logged → (no error) then 1
+select 'RP19 log health' as t, log_report_export('health', 'as of 03 Nov 2026', 'print') as r;
+select 'RP19 listed' as t, count(*) as n from report_exports where report = 'health';
+reset role;

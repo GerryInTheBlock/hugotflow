@@ -94,7 +94,7 @@ export default function InstructorAlerts() {
               {!expanded ? (
                 <Pressable onPress={() => setOpenId(a.alert_id)} style={[brandGlow, { borderRadius: 100 }]}>
                   <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, paddingVertical: 10, alignItems: "center" }}>
-                    <Text className="font-bold text-xs text-ink">Open Profile</Text>
+                    <Text className="font-bold text-xs text-on-brand">Open Profile</Text>
                   </LinearGradient>
                 </Pressable>
               ) : (

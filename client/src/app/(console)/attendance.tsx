@@ -180,12 +180,12 @@ export default function AttendancePage() {
           </View>
         ) : null}
         <View className="gap-[10px]">
-          <Pressable onPress={() => setTyping((v) => !v)} className="items-center rounded-field bg-white/[0.06] px-5 py-[10px]">
+          <Pressable onPress={() => setTyping((v) => !v)} className="items-center rounded-field bg-black/[0.04] px-5 py-[10px]">
             <Text className="font-bold text-xs text-ink">Enter code manually</Text>
           </Pressable>
           <Pressable onPress={() => setCamera((v) => !v)} style={[brandGlow, { borderRadius: 10 }]}>
             <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 10, paddingVertical: 10, alignItems: "center" }}>
-              <Text className="font-bold text-xs text-ink">{camera ? "Stop camera" : "Test Scanner"}</Text>
+              <Text className="font-bold text-xs text-on-brand">{camera ? "Stop camera" : "Test Scanner"}</Text>
             </LinearGradient>
           </Pressable>
           <Pressable onPress={() => setDayPassFor({ kind: "new" })} className="items-center rounded-field border border-line px-5 py-[10px]">
@@ -251,7 +251,7 @@ function ModeOption({ on, onPress, title, body }: { on: boolean; onPress: () => 
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ checked: on }}
-      className={`flex-row items-start gap-[10px] rounded-field border border-[rgba(206,206,206,0.5)] p-[10px] ${on ? "bg-white/[0.04]" : ""}`}
+      className={`flex-row items-start gap-[10px] rounded-field border border-[rgba(206,206,206,0.5)] p-[10px] ${on ? "bg-black/[0.03]" : ""}`}
     >
       <View className={`mt-[1px] h-3 w-3 rounded-full ${on ? "bg-line" : "border border-ink-2"}`} />
       <View className="flex-1 gap-[5px]">

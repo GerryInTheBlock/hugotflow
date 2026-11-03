@@ -180,7 +180,7 @@ export default function MemberHealthReview() {
         <Text className="font-bold text-xl text-ink">Recent workouts</Text>
         {workouts.length === 0 ? <Text className="font-medium text-sm text-ink-2">No finished workouts yet.</Text> : null}
         {workouts.map((w) => (
-          <View key={w.session_id} className="gap-1 rounded-field bg-white/[0.06] p-[10px]">
+          <View key={w.session_id} className="gap-1 rounded-field bg-black/[0.04] p-[10px]">
             <View className="flex-row items-center justify-between">
               <Text className="font-bold text-sm text-ink">{dateTime(w.finished_at ?? w.started_at)}</Text>
               <Badge

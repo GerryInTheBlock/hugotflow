@@ -144,7 +144,7 @@ export function QrScanner({ active, onCode, onStatus, onTurnOn, retryKey }: QrSc
           <Text className="absolute bottom-3 self-center font-medium text-xs text-ink-2">Starting camera…</Text>
         ) : null}
         {(status === "off" || status === "error") && onTurnOn ? (
-          <Pressable onPress={onTurnOn} className="absolute bottom-3 self-center rounded-field bg-white/[0.12] px-4 py-2">
+          <Pressable onPress={onTurnOn} className="absolute bottom-3 self-center rounded-field bg-black/[0.07] px-4 py-2">
             <Text className="font-bold text-xs text-ink">{status === "error" ? "Try again" : "Turn on camera"}</Text>
           </Pressable>
         ) : null}

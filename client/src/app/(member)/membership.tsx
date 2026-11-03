@@ -72,7 +72,7 @@ export default function MembershipScreen() {
             <View style={{ flex: Math.max(0.6, total - left - 1) }} className="h-[10px] rounded-full bg-line-strong" />
           </View>
         ) : null}
-        <View className="rounded-field bg-white/[0.06] p-3">
+        <View className="rounded-field bg-black/[0.04] p-3">
           <Text className="font-medium text-xs text-ink-2">
             Renew at the front desk with cash or GCash. Staff record it and your digital receipt appears below.
           </Text>
@@ -101,7 +101,7 @@ export default function MembershipScreen() {
           <Pressable
             key={r.transaction_id}
             onPress={() => router.push(r.status === "requested" ? "/(member)/day-pass" : `/(member)/receipt/${r.transaction_id}`)}
-            className="flex-row items-center justify-between rounded-field bg-white/[0.06] px-[15px] py-3"
+            className="flex-row items-center justify-between rounded-field bg-black/[0.04] px-[15px] py-3"
           >
             <View className="flex-shrink gap-[2px]">
               <Text className="font-bold text-sm text-ink">{title}</Text>

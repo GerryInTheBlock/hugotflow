@@ -58,7 +58,7 @@ function ConsoleShell() {
             const content = (
               <View className="flex-row items-center gap-[5px] px-3 py-[10px]">
                 <Icon name={n.icon} size={25} color={on ? "#FFFFFF" : colors.icon} />
-                <Text className={`text-sm ${on ? "font-semibold text-ink" : "font-medium text-ink-soft"}`}>{n.label}</Text>
+                <Text className={`text-sm ${on ? "font-semibold text-on-brand" : "font-medium text-ink-soft"}`}>{n.label}</Text>
               </View>
             );
             return (
@@ -75,10 +75,16 @@ function ConsoleShell() {
               </Pressable>
             );
           })}
-          <Pressable onPress={signOut} className="ml-2 rounded-full border border-line px-3 py-2.5">
-            <Text className="font-medium text-sm text-ink-2">Log out</Text>
-          </Pressable>
         </ScrollView>
+        {/* Pinned outside the scrolling nav so owner and staff always see it (it used to scroll off-screen). */}
+        <Pressable
+          onPress={signOut}
+          accessibilityRole="button"
+          accessibilityLabel={`Log out ${profile?.full_name ?? ""}`}
+          className="ml-3 flex-row items-center gap-2 rounded-full border border-line-strong px-4 py-2.5"
+        >
+          <Text className="font-semibold text-sm text-ink">Log out</Text>
+        </Pressable>
       </View>
       <View className="flex-1 px-5 pb-[30px] pt-[10px]">
         <Slot />

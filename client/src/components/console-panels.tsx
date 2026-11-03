@@ -34,7 +34,7 @@ export function Avatar({ name, photo, size = 60 }: { name: string; photo: string
         {photo ? (
           <Image source={{ uri: photo }} style={{ width: size, height: size }} />
         ) : (
-          <Text style={{ fontSize: size / 3 }} className="font-extrabold text-ink">
+          <Text style={{ fontSize: size / 3 }} className="font-extrabold text-on-brand">
             {initials(name)}
           </Text>
         )}
@@ -123,14 +123,14 @@ export function LiveAttendance({ refreshKey = 0 }: { refreshKey?: number }) {
   return (
     <View
       style={{ gap: 20, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 25, shadowOffset: { width: 0, height: 0 } }}
-      className="rounded-field border border-divider bg-white/[0.04] p-[15px]"
+      className="rounded-field border border-divider bg-black/[0.03] p-[15px]"
     >
       <PanelHeader icon="checked-user" title="Live attendance" subtitle="Today's check-ins" />
       {/* Same on Dashboard, Attendance and Members: about 6 rows show, the rest scroll inside the panel. */}
       <ScrollView style={{ maxHeight: 6 * 69 }} contentContainerClassName="gap-[10px] pr-[10px]" showsVerticalScrollIndicator>
         {visits === null ? <Empty>Loading…</Empty> : visits.length === 0 ? <Empty>No check-ins yet today.</Empty> : null}
         {visits?.map((v) => (
-          <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-white/[0.06] px-5">
+          <View key={v.log_id} className="h-[59px] flex-row items-center justify-between rounded-field border border-divider bg-black/[0.04] px-5">
             <View className="flex-shrink flex-row items-center gap-[10px]">
               {/* Weightlifter for instructors; standing figure for members, walk-ins and other visitors */}
               <Icon name={v.user?.role === "instructor" ? "weightlifting" : "standing-man"} size={25} />

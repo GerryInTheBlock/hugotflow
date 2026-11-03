@@ -56,7 +56,7 @@ export function PlanTags({ plan, experience, available, size = 10 }: { plan: Pla
 
 export function SkippedNote({ item, big }: { item: Skipped; big?: boolean }) {
   return (
-    <View className={`flex-row items-center justify-between rounded-field bg-white/[0.06] ${big ? "px-5 py-[15px]" : "px-4 py-[10px]"}`}>
+    <View className={`flex-row items-center justify-between rounded-field bg-black/[0.04] ${big ? "px-5 py-[15px]" : "px-4 py-[10px]"}`}>
       <View className="flex-1 gap-[5px]">
         <Text className={`font-medium text-ink-2 ${big ? "text-base" : "text-sm"}`}>{item.name} skipped</Text>
         <Text className={`font-extrabold text-ink-2 ${big ? "text-base" : "text-sm"}`}>{item.reason}</Text>
@@ -70,7 +70,7 @@ export function GradientButton({ label, onPress, busy, disabled, radius = 20 }: 
   return (
     <Pressable onPress={onPress} disabled={busy || disabled} style={[brandGlow, { borderRadius: radius, opacity: busy ? 0.7 : disabled ? 0.45 : 1 }]} accessibilityRole="button" accessibilityState={{ disabled: !!(busy || disabled) }}>
       <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: radius, paddingVertical: 15, alignItems: "center" }}>
-        {busy ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-sm text-ink">{label}</Text>}
+        {busy ? <ActivityIndicator color={colors.ink} /> : <Text className="font-bold text-sm text-on-brand">{label}</Text>}
       </LinearGradient>
     </Pressable>
   );
@@ -144,7 +144,7 @@ export function StartWorkoutButton() {
   }
   return (
     <View className="gap-[10px]">
-      <View className="flex-row items-start gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+      <View className="flex-row items-start gap-[10px] rounded-field bg-black/[0.04] p-[15px]">
         <Icon name="qr-code" size={25} />
         <Text className="flex-1 font-medium text-sm text-ink-2">
           Check in at the front desk first. Your workout starts once you are at Hugot Gym today.

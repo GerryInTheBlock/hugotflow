@@ -34,7 +34,7 @@ export function TabBar({ items, ...props }: BarProps & { items: TabItem[] }) {
                   style={{ width: 60, height: 60, borderRadius: 30, alignItems: "center", justifyContent: "center" }}
                 >
                   <Ionicons name={item.icon} size={24} color={colors.ink} />
-                  <Text className="font-bold text-[11px] text-ink">{item.label}</Text>
+                  <Text className="font-bold text-[11px] text-on-brand">{item.label}</Text>
                 </LinearGradient>
               </View>
             ) : (

@@ -142,7 +142,7 @@ export default function MembersPage() {
                       style={{ borderRadius: 100, flexDirection: "row", alignItems: "center", paddingRight: 10 }}
                     >
                       <Icon name="add-circle" size={30} color="#FFFFFF" />
-                      <Text className="font-medium text-xs text-ink">Add a Member</Text>
+                      <Text className="font-medium text-xs text-on-brand">Add a Member</Text>
                     </LinearGradient>
                   </Pressable>
                 </View>
@@ -285,13 +285,13 @@ function MemberCard({
           <Pressable onPress={admit} disabled={busy} style={[brandGlow, { borderRadius: 100, opacity: busy ? 0.6 : 1 }]} accessibilityRole="button">
             <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 100, paddingVertical: 10, paddingHorizontal: 20, flexDirection: "row", gap: 10, alignItems: "center", justifyContent: "center" }}>
               <Icon name="plus" size={20} color="#FFFFFF" />
-              <Text className="font-bold text-xs text-ink">{busy ? "Checking…" : "Admit Member"}</Text>
+              <Text className="font-bold text-xs text-on-brand">{busy ? "Checking…" : "Admit Member"}</Text>
             </LinearGradient>
           </Pressable>
           {outcome ? <Note tone={outcome.ok ? "neutral" : "danger"}>{outcome.text}</Note> : null}
           <Pressable
             onPress={() => router.push(`/(console)/payments?member=${member.user_id}&plan=daily`)}
-            className="flex-row items-center justify-center gap-[10px] rounded-full bg-white/[0.06] px-5 py-[10px]"
+            className="flex-row items-center justify-center gap-[10px] rounded-full bg-black/[0.04] px-5 py-[10px]"
           >
             <Icon name="ticket" size={25} />
             <Text className="font-bold text-xs text-ink">Generate Day Pass</Text>
@@ -391,7 +391,7 @@ function MemberDetail({
         <SmallBadge label={member.is_active ? "Active account" : "Deactivated"} tone={member.is_active ? "ok" : "danger"} />
       </View>
 
-      <View className="gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+      <View className="gap-[10px] rounded-field bg-black/[0.04] p-[15px]">
         {member.role === "member" ? <KeyValue label="Plan" value={m ? `${m.plan} · until ${shortDate(m.ends)}` : "No active plan"} /> : null}
         <KeyValue label="Check-in PIN" value={member.pin ?? "—"} />
         <KeyValue label="Email" value={member.email ?? "—"} />

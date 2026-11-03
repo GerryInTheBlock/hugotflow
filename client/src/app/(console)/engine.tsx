@@ -20,7 +20,7 @@ type Tab = "open" | "acknowledged" | "resolved" | "all";
 
 function Tile({ label, value, sub, tone }: { label: string; value: string; sub: string; tone?: "ok" | "danger" }) {
   return (
-    <View className="min-w-[140px] flex-1 gap-[2px] rounded-[15px] border border-white bg-white/[0.04] px-3 py-[10px]">
+    <View className="min-w-[140px] flex-1 gap-[2px] rounded-[15px] border border-line bg-black/[0.03] px-3 py-[10px]">
       <Text className="font-medium text-[10px] text-ink-2">{label}</Text>
       <Text className="font-bold text-lg text-ink" numberOfLines={1}>
         {value}
@@ -173,8 +173,8 @@ export default function EnginePage() {
                     ))}
                     <View style={[brandGlow, { borderRadius: 10 }]}>
                       <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8 }}>
-                        <Text className="font-bold text-xs text-ink">{latest.predicted_class}</Text>
-                        <Text className="font-medium text-[10px] text-ink">
+                        <Text className="font-bold text-xs text-on-brand">{latest.predicted_class}</Text>
+                        <Text className="font-medium text-[10px] text-on-brand">
                           {dosage} · 60 s rest{program?.modified ? " · low-impact" : ""}
                         </Text>
                       </LinearGradient>
@@ -238,7 +238,7 @@ export default function EnginePage() {
             ) : (
               <Note>High-risk alerts contain member health data (RA 10173), so only the owner and the instructors see them.</Note>
             )}
-            <Pressable onPress={() => setRules(true)} className="rounded-field bg-white/[0.06] p-[10px]">
+            <Pressable onPress={() => setRules(true)} className="rounded-field bg-black/[0.04] p-[10px]">
               <Text className="font-medium text-[10px] text-ink-2">
                 Instructors can open the IF-THEN rules of model {String(card?.version ?? "—")} to audit or adjust a routine. <Text className="font-bold text-ink">Open rules</Text>
               </Text>

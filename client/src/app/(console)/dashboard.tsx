@@ -34,8 +34,8 @@ function StatCard({ label, value, sub, subColor, accent, to }: { label: string; 
         gap: 6,
         borderRadius: 15,
         borderWidth: 1,
-        borderColor: hover ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)",
-        backgroundColor: hover ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.04)",
+        borderColor: hover ? "#E3061B" : "#E4E4E7",
+        backgroundColor: hover ? "#FFF5F5" : "#FFFFFF",
         shadowColor: "#000",
         shadowOpacity: 0.35,
         shadowRadius: 18,
@@ -114,7 +114,7 @@ export default function Dashboard() {
                 label="Today’s check-ins"
                 value={s ? String(s.checkins_today) : "—"}
                 sub={change == null ? "No visits this day last week" : `${change >= 0 ? "▲ +" : "▼ "}${change}% vs last week`}
-                subColor={change == null ? undefined : change >= 0 ? "#5CF000" : "#FF4D4F"}
+                subColor={change == null ? undefined : change >= 0 ? "#15803D" : "#DC2626"}
                 to="/(console)/attendance"
               />
               <StatCard label="Day pass revenue" value={s ? whole(s.day_pass_revenue_today) : "—"} sub="Today" to="/(console)/payments" />
@@ -122,15 +122,15 @@ export default function Dashboard() {
                 label="Monthly revenue"
                 value={s ? whole(s.month_revenue) : "—"}
                 sub={s && s.awaiting_owner_count > 0 ? `${month} · ${whole(s.awaiting_owner_amount)} to confirm` : month}
-                subColor={s && s.awaiting_owner_count > 0 ? "#FBBF24" : undefined}
+                subColor={s && s.awaiting_owner_count > 0 ? "#B45309" : undefined}
                 to="/(console)/payments"
               />
               <StatCard
                 label="Equipment reports"
                 value={s ? String(s.equipment_pending) : "—"}
                 sub={s && s.equipment_pending > 0 ? "Needs Attention!" : "✓ All machines clear"}
-                subColor={s && s.equipment_pending > 0 ? "#FF4D4F" : "#4ADE80"}
-                accent={s && s.equipment_pending > 0 ? "#FF4D4F" : "#3F3F46"}
+                subColor={s && s.equipment_pending > 0 ? "#DC2626" : "#15803D"}
+                accent={s && s.equipment_pending > 0 ? "#DC2626" : "#D4D4D8"}
                 to="/(console)/equipment"
               />
             </View>
@@ -140,7 +140,7 @@ export default function Dashboard() {
               title="Hourly crowd density"
               subtitle="Average check-ins per hour, last 30 days"
               right={
-                <View className="flex-row items-center gap-[5px] self-end rounded-full bg-white/[0.06] px-[10px] py-[3px]">
+                <View className="flex-row items-center gap-[5px] self-end rounded-full bg-black/[0.04] px-[10px] py-[3px]">
                   <Text className="text-[10px] text-ok-ink">•</Text>
                   <Text className="font-medium text-[10px] text-ink">{peak ?? "No check-ins yet"}</Text>
                 </View>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                 <View className="self-end">
                   <Legend
                     items={[
-                      { color: "#52525B", label: "Walk-in" },
+                      { color: "#A1A1AA", label: "Walk-in" },
                       { color: "#E3061B", label: "Subscription" },
                     ]}
                   />

@@ -29,7 +29,7 @@ export default function ReceiptScreen() {
           </View>
           <Text className="font-bold text-[32px] text-ink">{peso(receipt.amount)}</Text>
           <Text className="font-medium text-[13px] text-ink-2">{receiptSubtitle(receipt)}</Text>
-          <View className="gap-[10px] rounded-field bg-white/[0.06] p-[15px]">
+          <View className="gap-[10px] rounded-field bg-black/[0.04] p-[15px]">
             {receiptRows(receipt).map(([k, v]) => (
               <View key={k} className="flex-row justify-between gap-3">
                 <Text className="font-medium text-[13px] text-ink-2">{k}</Text>

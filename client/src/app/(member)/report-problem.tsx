@@ -40,7 +40,7 @@ function Dropdown({
       <Pressable
         onPress={() => setOpen((v) => !v)}
         accessibilityRole="button"
-        className="flex-row items-center justify-between rounded-full border border-line-strong bg-white/[0.08] px-5 py-[10px]"
+        className="flex-row items-center justify-between rounded-full border border-line-strong bg-black/[0.05] px-5 py-[10px]"
       >
         <Text className={`font-bold text-sm ${label ? "text-ink" : "text-ink-2"}`}>{label ?? placeholder}</Text>
         <Icon name="drop-down" size={20} style={open ? { transform: [{ rotate: "180deg" }] } : undefined} />
@@ -66,7 +66,7 @@ function Dropdown({
                   setOpen(false);
                   setQ("");
                 }}
-                className={`flex-row items-center justify-between px-4 py-3 ${o.key === value ? "bg-white/[0.08]" : ""}`}
+                className={`flex-row items-center justify-between px-4 py-3 ${o.key === value ? "bg-black/[0.05]" : ""}`}
               >
                 <Text className="font-semibold text-sm text-ink">{o.label}</Text>
                 {o.hint ? <Text className="font-medium text-xs text-ink-2">{o.hint}</Text> : null}
@@ -184,7 +184,7 @@ export default function ReportProblem() {
             placeholderTextColor={colors["ink-2"]}
             multiline
             textAlignVertical="top"
-            className="h-[126px] rounded-field border border-divider/50 bg-white/[0.08] p-[10px] font-medium text-sm text-ink"
+            className="h-[126px] rounded-field border border-divider/50 bg-black/[0.05] p-[10px] font-medium text-sm text-ink"
             style={{ outlineStyle: "none" } as object}
           />
         </View>
@@ -193,7 +193,7 @@ export default function ReportProblem() {
           <Dropdown value={location} placeholder="Where is it?" options={LOCATIONS.map((l) => ({ key: l, label: l }))} onChange={setLocation} />
         </View>
         <PhotoBox label="photo of the problem" photo={photo} onPhoto={setPhoto} onError={setError} />
-        <View className="flex-row items-center justify-between rounded-field bg-white/[0.06] px-5 py-[15px]">
+        <View className="flex-row items-center justify-between rounded-field bg-black/[0.04] px-5 py-[15px]">
           <Text className={`font-extrabold text-base ${risk ? "text-danger-ink" : "text-ink-2"}`}>Safety Risk</Text>
           <Toggle value={risk} onChange={setRisk} />
         </View>

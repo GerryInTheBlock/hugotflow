@@ -2,7 +2,7 @@ import tokens from "./tokens.json";
 
 export const colors = tokens.colors;
 
-/** Screen background: deep red glow at the top fading to near-black (Figma "Dark theme"). */
+/** Screen background: a faint red tint at the top fading to light grey (white theme, adviser review Nov 2026). */
 export const backgroundGradient = {
   colors: [colors["bg-top"], colors["bg-mid"], colors.bg] as const,
   locations: [0, 0.38, 1] as const,

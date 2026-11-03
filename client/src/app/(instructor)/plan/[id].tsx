@@ -82,7 +82,7 @@ function ItemForm({
       {exercises ? (
         <>
           <Text className="font-bold text-sm text-ink">Exercise</Text>
-          <Pressable onPress={() => setOpen((v) => !v)} className="flex-row items-center justify-between rounded-full border border-line-strong bg-white/[0.08] px-5 py-[10px]">
+          <Pressable onPress={() => setOpen((v) => !v)} className="flex-row items-center justify-between rounded-full border border-line-strong bg-black/[0.05] px-5 py-[10px]">
             <Text className={`font-bold text-sm ${chosen ? "text-ink" : "text-ink-2"}`}>{chosen?.name ?? "Choose an exercise"}</Text>
             <Icon name="drop-down" size={20} />
           </Pressable>
@@ -103,7 +103,7 @@ function ItemForm({
             </ScrollView>
           ) : null}
           <Text className="font-bold text-sm text-ink">Equipment</Text>
-          <View className="rounded-full border border-line-strong bg-white/[0.08] px-5 py-[10px]">
+          <View className="rounded-full border border-line-strong bg-black/[0.05] px-5 py-[10px]">
             <Text className="font-bold text-sm text-ink-2">{chosen?.equipment?.name ?? "—"}</Text>
           </View>
           {strains.length ? <InfoNote icon="high-priority">This exercise strains the member's {strains.map((s) => conditionLabel(s).toLowerCase()).join(" and ")}. Add it only if you will supervise.</InfoNote> : null}
@@ -310,7 +310,7 @@ export default function InstructorPlanEditor() {
           />
           <Pressable
             onPress={() => (changed ? (setItems(plan.routine), setNote(plan.instructor_note ?? "")) : router.back())}
-            className="items-center rounded-field border-2 border-[#54555A] px-5 py-[15px]"
+            className="items-center rounded-field border-2 border-line-strong px-5 py-[15px]"
           >
             <Text className="font-bold text-sm text-ink">{changed ? "Discard Changes" : "Back"}</Text>
           </Pressable>

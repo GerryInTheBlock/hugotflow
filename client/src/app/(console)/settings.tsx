@@ -166,7 +166,7 @@ function PlanEditor({ plan, onDone }: { plan: Plan; onDone: (saved: boolean) => 
   }
 
   return (
-    <View className="gap-3 rounded-field bg-white/[0.04] p-3">
+    <View className="gap-3 rounded-field bg-black/[0.03] p-3">
       <View className="flex-row gap-3">
         {[
           ["Price", price, setPrice, "decimal-pad"],

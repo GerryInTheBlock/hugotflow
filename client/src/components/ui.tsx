@@ -80,11 +80,11 @@ type ButtonProps = {
 export function Button({ label, onPress, variant = "primary", loading, disabled }: ButtonProps) {
   const off = disabled || loading;
   const text =
-    variant === "danger" ? "text-danger-ink" : "text-ink";
+    variant === "danger" ? "text-danger-ink" : variant === "primary" ? "text-on-brand" : "text-ink";
   const inner = (
     <View className="flex-row items-center justify-center py-[15px] px-5">
       {loading ? (
-        <ActivityIndicator color={colors.ink} />
+        <ActivityIndicator color={variant === "primary" ? colors["on-brand"] : colors.ink} />
       ) : (
         <Text className={`font-bold text-sm ${text}`}>{label}</Text>
       )}
@@ -131,7 +131,7 @@ export function Chip({ label, selected, onPress }: { label: string; selected?: b
     return (
       <Pressable onPress={onPress} style={[brandGlow, { borderRadius: 5 }]}>
         <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 5 }}>
-          <Text className="px-[15px] py-[10px] font-bold text-sm text-ink">{label}</Text>
+          <Text className="px-[15px] py-[10px] font-bold text-sm text-on-brand">{label}</Text>
         </LinearGradient>
       </Pressable>
     );
@@ -145,8 +145,8 @@ export function Chip({ label, selected, onPress }: { label: string; selected?: b
 
 const badgeStyles = {
   ok: "bg-ok/20 text-ok-ink",
-  warn: "bg-warn text-ink",
-  danger: "bg-danger text-ink",
+  warn: "bg-warn text-on-brand",
+  danger: "bg-danger text-on-brand",
   info: "bg-info text-ink",
   neutral: "bg-field text-ink-2",
 } as const;

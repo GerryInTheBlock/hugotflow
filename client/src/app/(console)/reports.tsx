@@ -9,6 +9,7 @@ import { Text, View } from "react-native";
 import { Chips, Columns, DataTable, Empty, FieldLabel, Input, MainPanel, Note, Page, PanelHeader, SidePanel, SmallBadge, WideButton, type BadgeTone } from "@/components/console";
 import { useAuth } from "@/lib/auth";
 import { clockTime, dateTime, dayMonth, manilaToday, peso, shortDate } from "@/lib/format";
+import { conditionLabel, DAILY, experienceLabel, goalLabel, severityLabel } from "@/lib/health";
 import { methodLabel, statusLabel, statusTone } from "@/lib/payments";
 import { printReport, type PrintableReport } from "@/lib/print";
 import {
@@ -19,12 +20,14 @@ import {
   periodLabel,
   recentExports,
   reportAttendance,
+  reportHealth,
   reportMembership,
   reportPayments,
   toCsv,
   type AttendanceRow,
   type ExportFormat,
   type ExportLog,
+  type HealthRow,
   type MembershipRow,
   type PaymentRow,
   type ReportKind,
@@ -32,7 +35,7 @@ import {
 
 const GYM = "HUGOT GYM · Bulihan, Silang, Cavite";
 const PAGE_SIZE = 50;
-const KIND_TITLE: Record<ReportKind, string> = { attendance: "Attendance", payments: "Payment records", membership: "Membership status" };
+const KIND_TITLE: Record<ReportKind, string> = { attendance: "Attendance", payments: "Payment records", membership: "Membership status", health: "Health records" };
 const METHOD: Record<string, string> = { dynamic_qr: "Dynamic QR", day_pass_qr: "Day-pass QR", pin: "PIN", phone: "Phone search", name: "Name search" };
 const MEMBERSHIP: Record<MembershipRow["status"], [string, BadgeTone]> = {
   active: ["Active", "ok"],
@@ -62,7 +65,7 @@ export default function Reports() {
   const [status, setStatus] = useState<string>("all");
   const [asOf, setAsOf] = useState(manilaToday());
 
-  const [data, setData] = useState<{ kind: ReportKind; rows: AttendanceRow[] | PaymentRow[] | MembershipRow[] } | null>(null);
+  const [data, setData] = useState<{ kind: ReportKind; rows: AttendanceRow[] | PaymentRow[] | MembershipRow[] | HealthRow[] } | null>(null);
   const [generatedAt, setGeneratedAt] = useState(new Date().toISOString());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,8 +82,8 @@ export default function Reports() {
     }
   };
 
-  const datesOk = kind === "membership" ? isIsoDate(asOf) : isIsoDate(from) && isIsoDate(to) && from <= to;
-  const period = kind === "membership" ? `as of ${shortDate(asOf)}` : datesOk ? periodLabel(from, to) : "";
+  const datesOk = kind === "health" ? true : kind === "membership" ? isIsoDate(asOf) : isIsoDate(from) && isIsoDate(to) && from <= to;
+  const period = kind === "health" ? `as of ${shortDate(manilaToday())}` : kind === "membership" ? `as of ${shortDate(asOf)}` : datesOk ? periodLabel(from, to) : "";
 
   const load = useCallback(async () => {
     if (!datesOk) return;
@@ -92,7 +95,9 @@ export default function Reports() {
           ? await reportAttendance(from, to, memberType, method === "all" ? null : method)
           : kind === "payments"
             ? await reportPayments(from, to, status === "all" ? null : status)
-            : await reportMembership(asOf);
+            : kind === "membership"
+              ? await reportMembership(asOf)
+              : await reportHealth();
       setData({ kind, rows });
       setGeneratedAt(new Date().toISOString());
       setPage(0);
@@ -155,6 +160,29 @@ export default function Reports() {
         note: "Revenue counts only payments the owner confirmed. Refunds are negative and lower the period they were made in.",
       };
     }
+    if (data.kind === "health") {
+      const rows = data.rows as HealthRow[];
+      const limited = rows.filter((r) => r.joint_conditions.length > 0).length;
+      const severe = rows.filter((r) => r.severity === "severe").length;
+      return {
+        title: `Member Health Records — ${period}`,
+        totals: [
+          ["Members", String(rows.length)],
+          ["With a joint or bone limitation", String(limited)],
+          ["Severe (High-Risk)", String(severe)],
+        ],
+        header: ["Member", "Age", "Goal", "Experience", "BMI", "Injuries / limitations", "Severity", "Latest daily status", "Reviewed"],
+        widths: [150, 40, 110, 90, 50, 170, 80, 150, 90],
+        rows: rows.map((r) => ({
+          key: r.user_id,
+          cells: r.has_profile
+            ? [r.member, r.age != null ? String(r.age) : "—", goalLabel(r.fitness_goal), experienceLabel(r.experience), r.bmi != null ? Number(r.bmi).toFixed(1) : "—", r.joint_conditions.length ? r.joint_conditions.map(conditionLabel).join(", ") : "None", r.joint_conditions.length ? severityLabel(r.severity) || "—" : "—", r.daily_status ? `${DAILY[r.daily_status].label}${r.daily_area ? ` · ${r.daily_area}` : ""} (${shortDate(r.daily_date)})` : "Not reported", r.reviewed_at ? shortDate(r.reviewed_at) : "Not yet"]
+            : [r.member, r.age != null ? String(r.age) : "—", "No health profile yet", "—", "—", "—", "—", "—", "—"],
+          badge: r.severity === "severe" ? { col: 6, tone: "danger" as BadgeTone } : r.severity === "moderate" ? { col: 6, tone: "warn" as BadgeTone } : undefined,
+        })),
+        note: "Confidential health information (RA 10173, Data Privacy Act). For the owner and the on-call instructors only.",
+      };
+    }
     const rows = data.rows as MembershipRow[];
     const count = (s: MembershipRow["status"]) => rows.filter((r) => r.status === s).length;
     return {
@@ -176,7 +204,7 @@ export default function Reports() {
 
   const generated = `Generated ${dateTime(generatedAt)} by ${profile?.full_name ?? "the owner"} (Owner)`;
   const printable: PrintableReport | null = report
-    ? { gym: GYM, title: report.title, generated, totals: report.totals, header: report.header, rows: report.rows.map((r) => r.cells), note: report.note }
+    ? { gym: GYM, title: report.title, period: period ? period.charAt(0).toUpperCase() + period.slice(1) : undefined, preparedBy: `${profile?.full_name ?? ""}, Owner`, generated, totals: report.totals, header: report.header, rows: report.rows.map((r) => r.cells), note: report.note }
     : null;
 
   const exportAs = async (format: ExportFormat) => {
@@ -184,7 +212,7 @@ export default function Reports() {
     setBusy(format);
     try {
       if (format === "csv") {
-        const stamp = kind === "membership" ? asOf : from.slice(0, 7) === to.slice(0, 7) ? from.slice(0, 7) : `${from}_${to}`;
+        const stamp = kind === "health" ? manilaToday() : kind === "membership" ? asOf : from.slice(0, 7) === to.slice(0, 7) ? from.slice(0, 7) : `${from}_${to}`;
         downloadFile(`hugotflow-${kind}-${stamp}.csv`, toCsv(report.header, report.rows.map((r) => r.cells)));
       } else {
         await printReport(printable);
@@ -213,11 +241,14 @@ export default function Reports() {
                 { value: "attendance", label: "Attendance" },
                 { value: "payments", label: "Payment records" },
                 { value: "membership", label: "Membership status" },
+                { value: "health", label: "Health records" },
               ]}
             />
 
             <View className="flex-row flex-wrap gap-5">
-              {kind === "membership" ? (
+              {kind === "health" ? (
+                <Note>All active members with their injuries and limitations, as recorded in their health profiles today.</Note>
+              ) : kind === "membership" ? (
                 <View className="gap-[6px]">
                   <FieldLabel>Status as of</FieldLabel>
                   <Input value={asOf} onChangeText={setAsOf} placeholder="YYYY-MM-DD" style={{ width: 140 }} />
@@ -287,7 +318,7 @@ export default function Reports() {
                 <>
                   <View className="flex-row flex-wrap gap-3">
                     {report.totals.map(([k, v]) => (
-                      <View key={k} style={{ minWidth: 150 }} className="flex-1 gap-1 rounded-field bg-white/[0.06] p-3">
+                      <View key={k} style={{ minWidth: 150 }} className="flex-1 gap-1 rounded-field bg-black/[0.04] p-3">
                         <Text className="font-medium text-[10px] text-ink-2">{k}</Text>
                         <Text className="font-bold text-xl text-ink">{v}</Text>
                       </View>
@@ -330,7 +361,7 @@ export default function Reports() {
             <Text className="pt-2 font-bold text-[13px] text-ink">Recent reports</Text>
             {recent.length === 0 ? <Empty>No reports exported yet.</Empty> : null}
             {recent.map((r) => (
-              <View key={r.export_id} className="flex-row items-center justify-between rounded-field bg-white/[0.06] px-3 py-[10px]">
+              <View key={r.export_id} className="flex-row items-center justify-between rounded-field bg-black/[0.04] px-3 py-[10px]">
                 <Text className="font-bold text-xs text-ink">{KIND_TITLE[r.report]}</Text>
                 <Text className="font-medium text-[10px] text-ink-2">
                   {r.period} · {r.format.toUpperCase()}

@@ -216,7 +216,7 @@ export default function WorkoutSession() {
             <Text className="font-medium text-base text-ink-2">{item.minutes ? `${item.minutes} minutes, easy to moderate pace` : `${item.intensity === "light" ? "Light" : "Moderate"} weight · rest ${item.rest_s ?? 60} s`}</Text>
           </View>
           {item.cue ? (
-            <View className="rounded-field bg-white/[0.06] p-[15px]">
+            <View className="rounded-field bg-black/[0.04] p-[15px]">
               <Text className="font-medium text-base text-ink-2">
                 <Text className="font-extrabold">Safety reminder</Text>: {item.cue}
               </Text>
@@ -231,7 +231,7 @@ export default function WorkoutSession() {
                 s === where.set ? (
                   <View key={s} style={[brandGlow, { flex: 1, borderRadius: 5 }]}>
                     <LinearGradient colors={brandGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 5, padding: 10, alignItems: "center" }}>
-                      <Text className="font-bold text-sm text-ink">Set {s + 1}</Text>
+                      <Text className="font-bold text-sm text-on-brand">Set {s + 1}</Text>
                     </LinearGradient>
                   </View>
                 ) : (
