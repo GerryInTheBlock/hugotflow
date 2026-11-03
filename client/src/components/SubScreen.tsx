@@ -41,12 +41,12 @@ export function SubScreen({
             >
               <Icon name="back" size={40} />
             </Pressable>
-            <Logo />
+            <Logo variant="mark" />
           </View>
           <View style={{ gap }} className="px-[15px] py-[17px]">
             <View>
               {kicker ? <Text className="font-medium text-base text-ink-2">{kicker}</Text> : null}
-              <Text className={plainTitle ? "font-bold text-2xl text-on-brand" : "font-extrabold-italic text-[32px] leading-[44px] text-on-brand"}>{title}</Text>
+              <Text className={plainTitle ? "font-bold text-2xl text-ink" : "font-extrabold-italic text-[32px] leading-[44px] text-ink"}>{title}</Text>
             </View>
             {children}
           </View>

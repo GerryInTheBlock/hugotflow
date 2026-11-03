@@ -46,7 +46,7 @@ function ConsoleShell() {
     <LinearGradient colors={backgroundGradient.colors} locations={backgroundGradient.locations} style={{ flex: 1 }}>
       {/* Figma "HugotFlow Web": logo on the left, nav group pushed to the right edge. On narrow screens the nav scrolls sideways. */}
       <View className="flex-row items-center px-5 py-[15px]">
-        <Logo />
+        <Logo variant="mark" />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

@@ -52,7 +52,7 @@ export default function BodyCheck() {
         <ScrollView contentContainerClassName="px-5 pt-5 pb-6">
           <View className="gap-[15px] px-[15px] py-[17px]">
             <Text className="font-medium text-base text-ink-2">{todayLabel()}</Text>
-            <Text className="font-bold text-[32px] text-on-brand">How is your body today?</Text>
+            <Text className="font-bold text-[32px] text-ink">How is your body today?</Text>
             <View className="gap-[15px]">
               {CHOICES.map((c) => (
                 <RadioRow key={c.value} label={c.label} on={choice === c.value} onPress={() => setChoice(c.value)} />
@@ -60,7 +60,7 @@ export default function BodyCheck() {
             </View>
             {choice && choice !== "good" ? (
               <View className="gap-[10px] py-[10px]">
-                <Text className="font-bold text-base text-on-brand">Where do you feel it?</Text>
+                <Text className="font-bold text-base text-ink">Where do you feel it?</Text>
                 <View className="flex-row flex-wrap gap-[10px]">
                   {BODY_AREAS.map((a) => (
                     <OptionChip key={a} label={a} on={area === a} onPress={() => setArea(a)} />
@@ -69,7 +69,7 @@ export default function BodyCheck() {
               </View>
             ) : null}
             <View className="gap-[10px]">
-              <Text className="font-bold text-base text-on-brand">Optional note</Text>
+              <Text className="font-bold text-base text-ink">Optional note</Text>
               <TextInput
                 value={note}
                 onChangeText={setNote}
@@ -77,7 +77,7 @@ export default function BodyCheck() {
                 textAlignVertical="top"
                 placeholder="Tell your instructor anything useful"
                 placeholderTextColor={colors["ink-2"]}
-                className="h-[175px] rounded-card border border-line bg-card p-5 font-medium text-base text-on-brand"
+                className="h-[175px] rounded-card border border-line bg-card p-5 font-medium text-base text-ink"
                 style={{ outlineStyle: "none" } as object}
               />
             </View>

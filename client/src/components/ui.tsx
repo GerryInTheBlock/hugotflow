@@ -47,17 +47,24 @@ export function Screen({
 /** The team's HugotFlow logo image (adviser review, Nov 2026): HUGOTFLOW with a red H and F between two barbells. */
 const LOGO = require("../../assets/images/logo.png");
 const LOGO_RATIO = 489 / 62;
+/** Compact mark (HF between two barbells) for inner pages and the console header, where the full logo is too wide. */
+const LOGO_MARK = require("../../assets/images/logo-mark.png");
+const MARK_RATIO = 454 / 144;
 
-/** HugotFlow logo. `size` = roughly the letter height in px; the image is shown at 1.25 × size tall. */
-export function Logo({ size = 22 }: { size?: number }) {
-  const height = size * 1.25;
+/**
+ * HugotFlow logo. "full" (welcome, sign-in, onboarding and the home screens) or "mark" (every other page).
+ * `size` = roughly the letter height in px.
+ */
+export function Logo({ size = 22, variant = "full" }: { size?: number; variant?: "full" | "mark" }) {
+  const mark = variant === "mark";
+  const height = size * (mark ? 1.5 : 1.25);
   return (
     <Image
-      source={LOGO}
+      source={mark ? LOGO_MARK : LOGO}
       accessibilityRole="image"
       accessibilityLabel="HugotFlow"
       resizeMode="contain"
-      style={{ height, width: height * LOGO_RATIO, alignSelf: "flex-start" }}
+      style={{ height, width: height * (mark ? MARK_RATIO : LOGO_RATIO), alignSelf: "flex-start" }}
     />
   );
 }

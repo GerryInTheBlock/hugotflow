@@ -67,10 +67,10 @@ export function StepScreen({
                 </Pressable>
               ) : null}
             </View>
-            <Text className="font-bold text-[32px] text-on-brand" style={{ maxWidth: 260 }}>
+            <Text className="font-bold text-[32px] text-ink" style={{ maxWidth: 260 }}>
               {title}
             </Text>
-            {subtitle ? <Text className="font-medium text-base text-on-brand">{subtitle}</Text> : null}
+            {subtitle ? <Text className="font-medium text-base text-ink-2">{subtitle}</Text> : null}
             {children}
           </View>
         </ScrollView>
@@ -184,7 +184,7 @@ export function BmiCard({ bmi, label }: { bmi: number | null; label: string }) {
         style={{ borderRadius: 10, padding: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
       >
         <View className="gap-[10px]">
-          <Text className="font-bold text-sm text-ink-2">Calculated BMI</Text>
+          <Text className="font-bold text-sm text-on-brand/80">Calculated BMI</Text>
           <Text className="font-bold text-[36px] text-on-brand">{bmi == null ? "—" : bmi.toFixed(1)}</Text>
         </View>
         <Text className="max-w-[55%] text-right font-bold text-sm text-white">{label}</Text>
